@@ -9,9 +9,10 @@ class PetcarePlanner extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           title: const Text("Petcare Planner"),
-          backgroundColor: Colors.amber,
+          backgroundColor: Color(0xFFFDF2DC),
         ),
         body: Center(child: Text("Hello Pet Owner")),
+        backgroundColor: Color(0xFFFDF2DC),
       ),
       debugShowCheckedModeBanner: false,
     );
