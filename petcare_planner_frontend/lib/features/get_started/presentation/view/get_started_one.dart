@@ -97,7 +97,7 @@ class GetStartedOne extends StatelessWidget {
                           spreadRadius: 0,
                         ),
                       ],
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                     child: SizedBox(
                       height: 44,
