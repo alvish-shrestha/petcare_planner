@@ -60,6 +60,7 @@ flutter:
   assets:
     - assets/images/get_started_one.png
     - assets/images/get_started_two.png
+    - assets/images/get_started_three.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
