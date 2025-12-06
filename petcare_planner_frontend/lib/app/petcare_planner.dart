@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/features/get_started/presentation/view/get_started_one.dart';
 
 class PetcarePlanner extends StatelessWidget {
   const PetcarePlanner({super.key});
@@ -6,14 +7,7 @@ class PetcarePlanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text("Petcare Planner"),
-          backgroundColor: Color(0xFFFDF2DC),
-        ),
-        body: Center(child: Text("Hello Pet Owner")),
-        backgroundColor: Color(0xFFFDF2DC),
-      ),
+      home: GetStartedOne(),
       debugShowCheckedModeBanner: false,
     );
   }
