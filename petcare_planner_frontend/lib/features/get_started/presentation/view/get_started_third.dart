@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/features/auth/presentation/view/register.dart';
 
 class GetStartedThree extends StatelessWidget {
   const GetStartedThree({super.key});
@@ -97,7 +98,44 @@ class GetStartedThree extends StatelessWidget {
                         shadowColor: Colors.transparent,
                         padding: EdgeInsets.zero,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            transitionDuration: const Duration(
+                              milliseconds: 200,
+                            ),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    const RegisterScreen(),
+                            transitionsBuilder:
+                                (
+                                  context,
+                                  animation,
+                                  secondaryAnimation,
+                                  child,
+                                ) {
+                                  final offsetAnimation = Tween<Offset>(
+                                    begin: const Offset(0.0, 0.1),
+                                    end: Offset.zero,
+                                  ).animate(animation);
+
+                                  final fadeAnimation = Tween<double>(
+                                    begin: 0.0,
+                                    end: 1.0,
+                                  ).animate(animation);
+
+                                  return SlideTransition(
+                                    position: offsetAnimation,
+                                    child: FadeTransition(
+                                      opacity: fadeAnimation,
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                          ),
+                        );
+                      },
                       child: const Text(
                         "Get Started",
                         style: TextStyle(
