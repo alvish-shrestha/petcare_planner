@@ -44,7 +44,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
           decoration: InputDecoration(
             hintText: widget.hint,
             hintStyle: const TextStyle(
-              fontFamily: "Poppins-Regular",
+              fontFamily: "Poppins",
               color: Colors.grey,
               fontSize: 16,
             ),
