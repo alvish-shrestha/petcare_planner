@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/core/common/slide_fade_route.dart';
+import 'package:petcare_planner_frontend/core/common/widgets/action_button.dart';
 import 'package:petcare_planner_frontend/features/get_started/presentation/view/get_started_one.dart';
 import 'package:petcare_planner_frontend/features/get_started/presentation/view/get_started_third.dart';
 
@@ -128,67 +130,18 @@ class GetStartedTwo extends StatelessWidget {
                           spreadRadius: 0,
                         ),
                       ],
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                    child: SizedBox(
-                      height: 44,
+                    child: ActionButton(
+                      text: "Next",
                       width: 175,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7BAF9E),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          shadowColor: Colors.transparent,
-                          padding: EdgeInsets.zero,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              transitionDuration: const Duration(
-                                milliseconds: 200,
-                              ),
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const GetStartedThree(),
-                              transitionsBuilder:
-                                  (
-                                    context,
-                                    animation,
-                                    secondaryAnimation,
-                                    child,
-                                  ) {
-                                    final offsetAnimation = Tween<Offset>(
-                                      begin: const Offset(0.0, 0.1),
-                                      end: Offset.zero,
-                                    ).animate(animation);
-
-                                    final fadeAnimation = Tween<double>(
-                                      begin: 0.0,
-                                      end: 1.0,
-                                    ).animate(animation);
-
-                                    return SlideTransition(
-                                      position: offsetAnimation,
-                                      child: FadeTransition(
-                                        opacity: fadeAnimation,
-                                        child: child,
-                                      ),
-                                    );
-                                  },
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          "Next",
-                          style: TextStyle(
-                            fontFamily: "Poppins-BoldItalic",
-                            fontSize: 16,
-                            color: Color(0xFFFDFDFD),
-                          ),
-                        ),
-                      ),
+                      height: 44,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          SlideFadeRoute(page: const GetStartedThree()),
+                        );
+                      },
                     ),
                   ),
                 ],
