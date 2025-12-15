@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/views/auth/login.dart';
 import 'package:petcare_planner_frontend/views/auth/register.dart';
+import 'package:provider/provider.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -12,8 +14,33 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   bool isLogin = true;
 
+  // --- Controllers for Login ---
+  final TextEditingController loginEmailController = TextEditingController();
+  final TextEditingController loginPasswordController = TextEditingController();
+
+  // --- Controllers for Register ---
+  final TextEditingController regUsernameController = TextEditingController();
+  final TextEditingController regEmailController = TextEditingController();
+  final TextEditingController regPasswordController = TextEditingController();
+  final TextEditingController regConfirmPasswordController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    loginEmailController.dispose();
+    loginPasswordController.dispose();
+
+    regUsernameController.dispose();
+    regEmailController.dispose();
+    regPasswordController.dispose();
+    regConfirmPasswordController.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authVM = Provider.of<AuthViewModel>(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF7EDD9),
       body: SafeArea(
@@ -69,14 +96,33 @@ class _AuthScreenState extends State<AuthScreen> {
                             );
                           },
                           child: isLogin
-                              ? const LoginForm(key: ValueKey("login"))
+                              ? LoginForm(
+                                  key: const ValueKey("login"),
+                                  onLoginSuccess: () {
+                                    // Navigate on success, e.g.
+                                    // Navigator.pushReplacementNamed(
+                                    //   context,
+                                    //   '/home',
+                                    // );
+                                    print("Login Successful");
+                                  },
+                                  emailController: loginEmailController,
+                                  passwordController: loginPasswordController,
+                                  authViewModel: authVM,
+                                )
                               : RegisterForm(
-                                  key: ValueKey("register"),
+                                  key: const ValueKey("register"),
                                   onRegisterSuccess: () {
                                     setState(() {
                                       isLogin = true;
                                     });
                                   },
+                                  usernameController: regUsernameController,
+                                  emailController: regEmailController,
+                                  passwordController: regPasswordController,
+                                  confirmPasswordController:
+                                      regConfirmPasswordController,
+                                  authViewModel: authVM,
                                 ),
                         ),
                       ),

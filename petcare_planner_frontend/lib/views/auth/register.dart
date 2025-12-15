@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 // import 'package:petcare_planner_frontend/core/common/slide_fade_route.dart';
 import 'package:petcare_planner_frontend/widgets/auth_text_field.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
@@ -6,8 +7,21 @@ import 'package:petcare_planner_frontend/widgets/action_button.dart';
 
 class RegisterForm extends StatelessWidget {
   final VoidCallback? onRegisterSuccess;
+  final TextEditingController usernameController;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final TextEditingController confirmPasswordController;
+  final AuthViewModel authViewModel;
 
-  const RegisterForm({Key? key, this.onRegisterSuccess}) : super(key: key);
+  const RegisterForm({
+    Key? key,
+    this.onRegisterSuccess,
+    required this.usernameController,
+    required this.emailController,
+    required this.passwordController,
+    required this.confirmPasswordController,
+    required this.authViewModel,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +51,23 @@ class RegisterForm extends StatelessWidget {
                     children: [
                       SizedBox(
                         width: 300,
-                        child: AuthTextField(hint: "Username"),
+                        child: AuthTextField(
+                          hint: "Username",
+                          controller: usernameController,
+                        ),
                       ),
-                      SizedBox(width: 300, child: AuthTextField(hint: "Email")),
+                      SizedBox(
+                        width: 300,
+                        child: AuthTextField(
+                          hint: "Email",
+                          controller: emailController,
+                        ),
+                      ),
                       SizedBox(
                         width: 300,
                         child: AuthTextField(
                           hint: "Password",
+                          controller: passwordController,
                           isPassword: true,
                         ),
                       ),
@@ -51,6 +75,7 @@ class RegisterForm extends StatelessWidget {
                         width: 300,
                         child: AuthTextField(
                           hint: "Confirm Password",
+                          controller: confirmPasswordController,
                           isPassword: true,
                         ),
                       ),
@@ -69,19 +94,32 @@ class RegisterForm extends StatelessWidget {
                           ],
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        child: ActionButton(
-                          text: "Register",
-                          onPressed: () {
-                            // Navigator.push(
-                            //   context,
-                            //   SlideFadeRoute(page: const LoginForm()),
-                            // );
-                            if (onRegisterSuccess != null) {
-                              onRegisterSuccess!();
-                            }
-                            print("Register pressed");
-                          },
-                        ),
+                        child: authViewModel.isLoading
+                            ? const CircularProgressIndicator()
+                            : ActionButton(
+                                text: "Register",
+                                onPressed: () async {
+                                  await authViewModel.register(
+                                    usernameController.text.trim(),
+                                    emailController.text.trim(),
+                                    passwordController.text.trim(),
+                                    confirmPasswordController.text.trim(),
+                                  );
+
+                                  if (authViewModel.errorMessage != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          authViewModel.errorMessage!,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    if (onRegisterSuccess != null)
+                                      onRegisterSuccess!();
+                                  }
+                                },
+                              ),
                       ),
                     ],
                   ),

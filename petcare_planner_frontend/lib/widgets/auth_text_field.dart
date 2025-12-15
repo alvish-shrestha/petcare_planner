@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class AuthTextField extends StatefulWidget {
   final String hint;
-  // final TextEditingController controller;
+  final TextEditingController controller;
   final bool isPassword;
   final TextInputType keyboardType;
 
   const AuthTextField({
     super.key,
     required this.hint,
-    // required this.controller,
+    required this.controller,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
   });
@@ -38,7 +38,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
           borderRadius: BorderRadius.circular(18),
         ),
         child: TextField(
-          // controller: widget.controller,
+          controller: widget.controller,
           obscureText: widget.isPassword ? _obscureText : false,
           keyboardType: widget.keyboardType,
           decoration: InputDecoration(
