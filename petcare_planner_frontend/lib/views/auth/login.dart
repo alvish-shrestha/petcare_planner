@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 // import 'package:petcare_planner_frontend/core/common/slide_fade_route.dart';
 import 'package:petcare_planner_frontend/widgets/auth_text_field.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
@@ -6,8 +7,17 @@ import 'package:petcare_planner_frontend/widgets/action_button.dart';
 
 class LoginForm extends StatelessWidget {
   final VoidCallback? onLoginSuccess;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final AuthViewModel authViewModel;
 
-  const LoginForm({Key? key, this.onLoginSuccess}) : super(key: key);
+  const LoginForm({
+    Key? key,
+    this.onLoginSuccess,
+    required this.emailController,
+    required this.passwordController,
+    required this.authViewModel,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +46,19 @@ class LoginForm extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // SizedBox(height: 270),
-                      SizedBox(width: 300, child: AuthTextField(hint: "Email")),
+                      SizedBox(
+                        width: 300,
+                        child: AuthTextField(
+                          hint: "Email",
+                          controller: emailController,
+                        ),
+                      ),
 
                       SizedBox(
                         width: 300,
                         child: AuthTextField(
                           hint: "Password",
+                          controller: passwordController,
                           isPassword: true,
                         ),
                       ),
@@ -81,19 +98,30 @@ class LoginForm extends StatelessWidget {
                           ],
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        child: ActionButton(
-                          text: "Login",
-                          onPressed: () {
-                            // Navigator.push(
-                            //   context,
-                            //   SlideFadeRoute(page: const RegisterForm()),
-                            // );
-                            if (onLoginSuccess != null) {
-                              onLoginSuccess!();
-                            }
-                            print("Login pressed");
-                          },
-                        ),
+                        child: authViewModel.isLoading
+                            ? const CircularProgressIndicator()
+                            : ActionButton(
+                                text: "Login",
+                                onPressed: () async {
+                                  await authViewModel.login(
+                                    emailController.text.trim(),
+                                    passwordController.text.trim(),
+                                  );
+
+                                  if (authViewModel.errorMessage != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          authViewModel.errorMessage!,
+                                        ),
+                                      ),
+                                    );
+                                  } else if (authViewModel.user != null) {
+                                    if (onLoginSuccess != null)
+                                      onLoginSuccess!();
+                                  }
+                                },
+                              ),
                       ),
                     ],
                   ),
