@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/core/common/slide_fade_route.dart';
-import 'package:petcare_planner_frontend/core/common/widgets/action_button.dart';
-import 'package:petcare_planner_frontend/features/get_started/presentation/view/get_started_two.dart';
+import 'package:petcare_planner_frontend/widgets/slide_fade_route.dart';
+import 'package:petcare_planner_frontend/widgets/action_button.dart';
+import 'package:petcare_planner_frontend/views/get_started/get_started_one.dart';
+import 'package:petcare_planner_frontend/views/get_started/get_started_third.dart';
 
-class GetStartedOne extends StatelessWidget {
-  const GetStartedOne({super.key});
+class GetStartedTwo extends StatelessWidget {
+  const GetStartedTwo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF2DC),
+      backgroundColor: const Color(0xFFFDECD7),
       body: SafeArea(
         child: Column(
           children: [
@@ -47,9 +48,9 @@ class GetStartedOne extends StatelessWidget {
             /// --- Image Section ---
             SizedBox(
               width: MediaQuery.of(context).size.width,
-              height: 392,
+              height: 392, // Fixed height
               child: Image.asset(
-                "assets/images/get_started_one.png",
+                "assets/images/get_started_two.png",
                 fit: BoxFit.cover,
               ),
             ),
@@ -60,7 +61,7 @@ class GetStartedOne extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.0),
               child: Text(
-                "Organize your pet’s daily\ncare easily.",
+                "Get alerts for feeding, walks,\nand vet visits.",
                 style: TextStyle(
                   fontFamily: "Poppins-SemiBold",
                   fontSize: 18,
@@ -79,9 +80,39 @@ class GetStartedOne extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 200),
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const GetStartedOne(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                                final offsetAnimation = Tween<Offset>(
+                                  begin: const Offset(0.0, 0.1),
+                                  end: Offset.zero,
+                                ).animate(animation);
+
+                                final fadeAnimation = Tween<double>(
+                                  begin: 0.0,
+                                  end: 1.0,
+                                ).animate(animation);
+
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: FadeTransition(
+                                    opacity: fadeAnimation,
+                                    child: child,
+                                  ),
+                                );
+                              },
+                        ),
+                      );
+                    },
                     child: const Text(
-                      "Skip",
+                      "Back",
                       style: TextStyle(
                         fontFamily: "Poppins-Italic",
                         fontSize: 16,
@@ -108,7 +139,7 @@ class GetStartedOne extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          SlideFadeRoute(page: const GetStartedTwo()),
+                          SlideFadeRoute(page: const GetStartedThree()),
                         );
                       },
                     ),

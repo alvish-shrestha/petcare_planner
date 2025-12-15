@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:petcare_planner_frontend/app/petcare_planner.dart';
+import 'package:petcare_planner_frontend/petcare_planner.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

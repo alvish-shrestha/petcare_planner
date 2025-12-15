@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/core/common/slide_fade_route.dart';
-import 'package:petcare_planner_frontend/features/auth/presentation/view/auth_screen.dart';
-import 'package:petcare_planner_frontend/core/common/widgets/action_button.dart';
+import 'package:petcare_planner_frontend/widgets/slide_fade_route.dart';
+import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
+import 'package:petcare_planner_frontend/widgets/action_button.dart';
 
 class GetStartedThree extends StatelessWidget {
   const GetStartedThree({super.key});
