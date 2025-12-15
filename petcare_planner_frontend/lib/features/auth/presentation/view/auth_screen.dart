@@ -17,52 +17,75 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF7EDD9),
       body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 45),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: ClampingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 45),
 
-            /// --- App Title ---
-            const Text(
-              "PetCare Planner",
-              style: TextStyle(
-                fontFamily: "Poppins-Bold",
-                fontSize: 36,
-                color: Color(0xFF725E5E),
+                      /// --- App Title ---
+                      const Text(
+                        "PetCare Planner",
+                        style: TextStyle(
+                          fontFamily: "Poppins-Bold",
+                          fontSize: 36,
+                          color: Color(0xFF725E5E),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      /// --- Toggle Buttons ---
+                      _buildToggle(),
+
+                      const SizedBox(height: 10),
+
+                      /// --- Forms ---
+                      Flexible(
+                        fit: FlexFit.loose,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          switchInCurve: Curves.easeOut,
+                          switchOutCurve: Curves.easeIn,
+                          transitionBuilder: (child, animation) {
+                            final isLogin =
+                                child.key == const ValueKey("login");
+
+                            final offsetAnimation = Tween<Offset>(
+                              begin: isLogin
+                                  ? const Offset(-1, 0)
+                                  : const Offset(1, 0),
+                              end: Offset.zero,
+                            ).animate(animation);
+
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
+                          child: isLogin
+                              ? const LoginForm(key: ValueKey("login"))
+                              : RegisterForm(
+                                  key: ValueKey("register"),
+                                  onRegisterSuccess: () {
+                                    setState(() {
+                                      isLogin = true;
+                                    });
+                                  },
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-
-            const SizedBox(height: 20),
-
-            /// --- Toggle Buttons ---
-            _buildToggle(),
-
-            const SizedBox(height: 10),
-
-            /// --- Forms ---
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                transitionBuilder: (child, animation) {
-                  final isLogin = child.key == const ValueKey("login");
-
-                  final offsetAnimation = Tween<Offset>(
-                    begin: isLogin ? const Offset(-1, 0) : const Offset(1, 0),
-                    end: Offset.zero,
-                  ).animate(animation);
-
-                  return SlideTransition(
-                    position: offsetAnimation,
-                    child: child,
-                  );
-                },
-                child: isLogin
-                    ? const LoginForm(key: ValueKey("login"))
-                    : const RegisterForm(key: ValueKey("register")),
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
