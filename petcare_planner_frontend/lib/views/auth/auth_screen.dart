@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/features/auth/presentation/view/login.dart';
-import 'package:petcare_planner_frontend/features/auth/presentation/view/register.dart';
+import 'package:petcare_planner_frontend/views/auth/login.dart';
+import 'package:petcare_planner_frontend/views/auth/register.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});

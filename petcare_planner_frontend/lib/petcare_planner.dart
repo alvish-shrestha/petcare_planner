@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/features/get_started/presentation/view/get_started_one.dart';
+import 'package:petcare_planner_frontend/views/get_started/get_started_one.dart';
 
 class PetcarePlanner extends StatelessWidget {
   const PetcarePlanner({super.key});

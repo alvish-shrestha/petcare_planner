@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 // import 'package:petcare_planner_frontend/core/common/slide_fade_route.dart';
-import 'package:petcare_planner_frontend/core/common/auth_text_field.dart';
-import 'package:petcare_planner_frontend/core/common/widgets/action_button.dart';
-// import 'package:petcare_planner_frontend/features/auth/presentation/view/register.dart';
+import 'package:petcare_planner_frontend/widgets/auth_text_field.dart';
+import 'package:petcare_planner_frontend/widgets/action_button.dart';
+// import 'package:petcare_planner_frontend/features/auth/presentation/view/login.dart';
 
-class LoginForm extends StatelessWidget {
-  final VoidCallback? onLoginSuccess;
+class RegisterForm extends StatelessWidget {
+  final VoidCallback? onRegisterSuccess;
 
-  const LoginForm({Key? key, this.onLoginSuccess}) : super(key: key);
+  const RegisterForm({Key? key, this.onRegisterSuccess}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class LoginForm extends StatelessWidget {
             children: [
               // --- Image ---
               Image.asset(
-                "assets/images/login.png",
+                "assets/images/register.png",
                 width: MediaQuery.of(context).size.width,
                 height: 392,
                 fit: BoxFit.cover,
@@ -29,15 +29,17 @@ class LoginForm extends StatelessWidget {
 
               // --- Text Fields ---
               Align(
-                alignment: const Alignment(0, 0.82),
+                alignment: const Alignment(0, 1),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // SizedBox(height: 270),
+                      SizedBox(
+                        width: 300,
+                        child: AuthTextField(hint: "Username"),
+                      ),
                       SizedBox(width: 300, child: AuthTextField(hint: "Email")),
-
                       SizedBox(
                         width: 300,
                         child: AuthTextField(
@@ -45,29 +47,15 @@ class LoginForm extends StatelessWidget {
                           isPassword: true,
                         ),
                       ),
-
                       SizedBox(
                         width: 300,
-                        height: 37,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              // TODO: Navigate to Forgot Password screen
-                            },
-                            child: Text(
-                              "Forgot Password?",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF000000),
-                                fontFamily: "Montserrat",
-                              ),
-                            ),
-                          ),
+                        child: AuthTextField(
+                          hint: "Confirm Password",
+                          isPassword: true,
                         ),
                       ),
 
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 24),
 
                       Container(
                         decoration: BoxDecoration(
@@ -82,16 +70,16 @@ class LoginForm extends StatelessWidget {
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: ActionButton(
-                          text: "Login",
+                          text: "Register",
                           onPressed: () {
                             // Navigator.push(
                             //   context,
-                            //   SlideFadeRoute(page: const RegisterForm()),
+                            //   SlideFadeRoute(page: const LoginForm()),
                             // );
-                            if (onLoginSuccess != null) {
-                              onLoginSuccess!();
+                            if (onRegisterSuccess != null) {
+                              onRegisterSuccess!();
                             }
-                            print("Login pressed");
+                            print("Register pressed");
                           },
                         ),
                       ),
