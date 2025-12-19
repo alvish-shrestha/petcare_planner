@@ -4,5 +4,5 @@ const app = require("./index");
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
-  console.log("Server running".white.underline.bold);
+  console.log(`Server running on port: ${PORT}`.green.underline.bold);
 });
