@@ -7,12 +7,12 @@ class CustomDropdown extends StatefulWidget {
   final ValueChanged<String?> onChanged;
 
   const CustomDropdown({
-    Key? key,
+    super.key,
     required this.value,
     required this.items,
     required this.hint,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomDropdown> createState() => _CustomDropdownState();
@@ -46,6 +46,40 @@ class _CustomDropdownState extends State<CustomDropdown> {
       ),
       child: PopupMenuButton<String?>(
         onSelected: _handleSelection,
+
+        // --- The menu items to show ---
+        itemBuilder: (context) {
+          List<PopupMenuEntry<String?>> menuItems = [
+            PopupMenuItem<String?>(
+              value: null,
+              child: const Text(
+                'Select',
+                style: TextStyle(color: Color(0x40725E5E)),
+              ),
+            ),
+          ];
+
+          menuItems.addAll(
+            widget.items.map(
+              (item) => PopupMenuItem<String?>(value: item, child: Text(item)),
+            ),
+          );
+
+          return menuItems;
+        },
+
+        // You can customize the popup shape here (border radius, shadow)
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(8),
+            bottomRight: Radius.circular(8),
+            topLeft: Radius.circular(8),
+            topRight: Radius.circular(8),
+          ),
+        ),
+
+        // Offset the popup if needed to appear just below the button
+        offset: const Offset(0, 52),
         child: Container(
           height: 52,
           padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -81,40 +115,6 @@ class _CustomDropdownState extends State<CustomDropdown> {
             ],
           ),
         ),
-
-        // --- The menu items to show ---
-        itemBuilder: (context) {
-          List<PopupMenuEntry<String?>> menuItems = [
-            PopupMenuItem<String?>(
-              value: null,
-              child: const Text(
-                'Select',
-                style: TextStyle(color: Color(0x40725E5E)),
-              ),
-            ),
-          ];
-
-          menuItems.addAll(
-            widget.items.map(
-              (item) => PopupMenuItem<String?>(value: item, child: Text(item)),
-            ),
-          );
-
-          return menuItems;
-        },
-
-        // You can customize the popup shape here (border radius, shadow)
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8),
-            topLeft: Radius.circular(8),
-            topRight: Radius.circular(8),
-          ),
-        ),
-
-        // Offset the popup if needed to appear just below the button
-        offset: const Offset(0, 52),
       ),
     );
   }
