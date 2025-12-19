@@ -38,9 +38,16 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
+  void _clearRegisterFields() {
+    regUsernameController.clear();
+    regEmailController.clear();
+    regPasswordController.clear();
+    regConfirmPasswordController.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final authVM = Provider.of<AuthViewModel>(context);
+    final authVM = context.watch<AuthViewModel>();
     return Scaffold(
       backgroundColor: const Color(0xFFF7EDD9),
       body: SafeArea(
@@ -113,6 +120,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               : RegisterForm(
                                   key: const ValueKey("register"),
                                   onRegisterSuccess: () {
+                                    _clearRegisterFields();
                                     setState(() {
                                       isLogin = true;
                                     });
