@@ -7,11 +7,12 @@ const connectDB = async () => {
   try {
     await mongoose.connect(CONNECTION_STRING);
     console.log(
-      `Mongodb connected: ${mongoose.connection.name}`.white.underline.bold
+      `Mongodb connected: ${mongoose.connection.name}`.green.underline.bold
     );
   } catch (err) {
     console.log("Database error".red.underline.bold);
     console.error(err.message.red);
+    process.exit(1);
   }
 };
 
