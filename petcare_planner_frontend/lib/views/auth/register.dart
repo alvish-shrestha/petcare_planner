@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
@@ -13,14 +15,14 @@ class RegisterForm extends StatelessWidget {
   final AuthViewModel authViewModel;
 
   const RegisterForm({
-    Key? key,
+    super.key,
     this.onRegisterSuccess,
     required this.usernameController,
     required this.emailController,
     required this.passwordController,
     required this.confirmPasswordController,
     required this.authViewModel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -117,8 +119,9 @@ class RegisterForm extends StatelessWidget {
                                       message: "Registered successfully!",
                                       type: SnackBarType.success,
                                     );
-                                    if (onRegisterSuccess != null)
+                                    if (onRegisterSuccess != null) {
                                       onRegisterSuccess!();
+                                    }
                                   }
                                 },
                               ),

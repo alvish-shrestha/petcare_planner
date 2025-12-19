@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element_parameter, unnecessary_underscores, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
@@ -9,7 +11,7 @@ import 'package:petcare_planner_frontend/widgets/pet_type_card.dart';
 import 'package:provider/provider.dart';
 
 class AddPetScreen extends StatelessWidget {
-  const AddPetScreen({Key? key}) : super(key: key);
+  const AddPetScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class AddPetScreen extends StatelessWidget {
 }
 
 class _AddPetForm extends StatelessWidget {
-  const _AddPetForm({Key? key}) : super(key: key);
+  const _AddPetForm({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +287,7 @@ class _AddPetForm extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
 
             /// --- SUBMIT BUTTON ---
             Container(

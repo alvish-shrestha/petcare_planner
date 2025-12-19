@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element_parameter
+
 import 'package:flutter/material.dart';
 
 class AppSnackBar {
@@ -58,10 +60,10 @@ class _AnimatedSnackBarContent extends StatefulWidget {
   final String message;
 
   const _AnimatedSnackBarContent({
-    Key? key,
+    super.key,
     required this.icon,
     required this.message,
-  }) : super(key: key);
+  });
 
   @override
   State<_AnimatedSnackBarContent> createState() =>
