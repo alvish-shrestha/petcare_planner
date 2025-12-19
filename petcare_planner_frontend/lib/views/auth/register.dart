@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
+import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 // import 'package:petcare_planner_frontend/core/common/slide_fade_route.dart';
 import 'package:petcare_planner_frontend/widgets/auth_text_field.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
@@ -107,14 +108,17 @@ class RegisterForm extends StatelessWidget {
                                   );
 
                                   if (authViewModel.errorMessage != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          authViewModel.errorMessage!,
-                                        ),
-                                      ),
+                                    AppSnackBar.show(
+                                      context,
+                                      message: authViewModel.errorMessage!,
+                                      type: SnackBarType.error,
                                     );
                                   } else {
+                                    AppSnackBar.show(
+                                      context,
+                                      message: "Registered successfully!",
+                                      type: SnackBarType.success,
+                                    );
                                     if (onRegisterSuccess != null)
                                       onRegisterSuccess!();
                                   }

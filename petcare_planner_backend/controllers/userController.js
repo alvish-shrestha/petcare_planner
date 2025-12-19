@@ -14,6 +14,15 @@ exports.registerUser = async (req, res) => {
     });
   }
 
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid email format",
+    });
+  }
+
   // Check if passwords match
   if (password != confirmPassword) {
     return res.status(400).json({
