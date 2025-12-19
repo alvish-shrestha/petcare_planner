@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/repositories/pet_repository.dart';
+import 'package:petcare_planner_frontend/services/pet_service.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
+import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
+import 'package:petcare_planner_frontend/views/pet/add_pet.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
-// import 'package:petcare_planner_frontend/core/common/slide_fade_route.dart';
 import 'package:petcare_planner_frontend/widgets/auth_text_field.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
-// import 'package:petcare_planner_frontend/features/auth/presentation/view/register.dart';
+import 'package:provider/provider.dart';
 
 class LoginForm extends StatelessWidget {
   final VoidCallback? onLoginSuccess;
@@ -120,6 +123,19 @@ class LoginForm extends StatelessWidget {
                                       context,
                                       message: "Login Successful!",
                                       type: SnackBarType.success,
+                                    );
+
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ChangeNotifierProvider(
+                                              create: (_) => PetViewModel(
+                                                PetRepository(PetService()),
+                                              ),
+                                              child: const AddPetScreen(),
+                                            ),
+                                      ),
                                     );
 
                                     if (onLoginSuccess != null)

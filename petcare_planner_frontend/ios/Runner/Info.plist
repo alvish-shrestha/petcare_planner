@@ -50,5 +50,12 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<!-- Photo Library access -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to select pet images.</string>
+
+	<!-- Camera access (if you allow taking photos) -->
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your camera to take pet photos.</string>
 </dict>
 </plist>

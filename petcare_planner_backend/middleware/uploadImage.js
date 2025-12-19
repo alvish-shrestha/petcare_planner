@@ -10,15 +10,26 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
+const allowedExtensions = /jpeg|jpg|png|heic|heif/;
+const allowedMimeTypes = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/heic",
+  "image/heif",
+];
 
-  if (extname && mimetype) {
+const fileFilter = (req, file, cb) => {
+  const extname = allowedExtensions.test(
+    path.extname(file.originalname).toLowerCase()
+  );
+
+  const mimetype = allowedMimeTypes.includes(file.mimetype);
+
+  if ((mimetype || file.mimetype === "application/octet-stream") && extname) {
     cb(null, true);
   } else {
-    cb(new Error("Only .jpeg, .jpg and .png images are allowed"));
+    cb(new Error("Only .jpeg, .jpg, .png, .heic and .heif images are allowed"));
   }
 };
 

@@ -26,6 +26,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", userRoute);
 
 // --- Pet Routes ---
-app.use("/pet", petRoute);
+app.use("/api/pet", petRoute);
 
 module.exports = app;
