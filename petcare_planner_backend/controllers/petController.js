@@ -2,12 +2,12 @@ const Pet = require("../models/Pet");
 const fs = require("fs");
 const path = require("path");
 
+// --- Add Pet ---
 exports.addPet = async (req, res) => {
   try {
     const { petType, petName, breed, age, gender } = req.body;
     const petImage = req.file ? req.file.path : null;
 
-    // Check for required fields
     if (!petType || !petName || !breed || !age || !gender) {
       return res.status(400).json({
         success: false,
@@ -15,7 +15,6 @@ exports.addPet = async (req, res) => {
       });
     }
 
-    // Validate petType
     const validTypes = ["Dog", "Cat", "Other"];
     if (!validTypes.includes(petType)) {
       return res.status(400).json({
@@ -24,7 +23,6 @@ exports.addPet = async (req, res) => {
       });
     }
 
-    // Validate gender
     const validGenders = ["Male", "Female"];
     if (!validGenders.includes(gender)) {
       return res.status(400).json({
@@ -33,7 +31,6 @@ exports.addPet = async (req, res) => {
       });
     }
 
-    // Validate age is a positive number
     const parsedAge = Number(age);
     if (isNaN(parsedAge) || parsedAge < 0) {
       return res.status(400).json({
@@ -42,7 +39,6 @@ exports.addPet = async (req, res) => {
       });
     }
 
-    // Check if pet already exists with same type, name, and breed
     const existingPet = await Pet.findOne({
       petType: petType,
       petName: petName.toLowerCase(),
@@ -84,6 +80,7 @@ exports.addPet = async (req, res) => {
   }
 };
 
+// --- Get All Pets ---
 exports.getAllPets = async (req, res) => {
   try {
     const pets = await Pet.find();
@@ -100,6 +97,7 @@ exports.getAllPets = async (req, res) => {
   }
 };
 
+// --- Get Pet by id ---
 exports.getPetById = async (req, res) => {
   try {
     const petId = req.params.id;
@@ -125,13 +123,13 @@ exports.getPetById = async (req, res) => {
   }
 };
 
+// --- Update Pet Profile ---
 exports.updatePet = async (req, res) => {
   try {
     const petId = req.params.id;
     const { petType, petName, breed, age, gender } = req.body;
     const petImage = req.file ? req.file.path : null;
 
-    // Normalize fields if provided
     const updateData = {};
 
     if (petType) {
@@ -179,7 +177,6 @@ exports.updatePet = async (req, res) => {
       updateData.petImage = petImage;
     }
 
-    // Check if the updated pet already exists to avoid duplicates
     if (
       updateData.petType &&
       updateData.petName &&
@@ -230,6 +227,7 @@ exports.updatePet = async (req, res) => {
   }
 };
 
+// --- Delete Pet Profile ---
 exports.deletePet = async (req, res) => {
   try {
     const petId = req.params.id;

@@ -7,6 +7,7 @@ const path = require("path");
 
 const userRoute = require("./routes/userRoutes");
 const petRoute = require("./routes/petRoutes");
+const taskRoute = require("./routes/taskRoutes");
 
 const cors = require("cors");
 
@@ -27,5 +28,8 @@ app.use("/api/auth", userRoute);
 
 // --- Pet Routes ---
 app.use("/api/pet", petRoute);
+
+// --- Task Routes ---
+app.use("/api/task", taskRoute);
 
 module.exports = app;
