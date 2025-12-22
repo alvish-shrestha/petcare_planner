@@ -7,6 +7,7 @@ class CustomTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final bool enabled;
   final ValueChanged<String>? onChanged;
+  final bool isMultiline;
 
   const CustomTextField({
     super.key,
@@ -16,6 +17,7 @@ class CustomTextField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.enabled = true,
     this.onChanged,
+    this.isMultiline = false,
   });
 
   @override

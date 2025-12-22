@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/repositories/pet_repository.dart';
+import 'package:petcare_planner_frontend/repository/pet_repository.dart';
 import 'package:petcare_planner_frontend/services/pet_service.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
