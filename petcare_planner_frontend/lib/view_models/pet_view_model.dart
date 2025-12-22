@@ -82,4 +82,22 @@ class PetViewModel extends ChangeNotifier {
     isLoading = value;
     notifyListeners();
   }
+
+  Future<void> fetchPets() async {
+    _setLoading(true);
+    errorMessage = null;
+
+    try {
+      final response = await _repository.getAllPets();
+      if (response['success'] == true) {
+        pets = (response['pets'] as List).map((e) => Pet.fromJson(e)).toList();
+      } else {
+        errorMessage = response['message'] ?? 'Failed to load pets';
+      }
+    } catch (e) {
+      errorMessage = e.toString();
+    } finally {
+      _setLoading(false);
+    }
+  }
 }

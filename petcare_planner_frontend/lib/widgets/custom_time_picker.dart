@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:petcare_planner_frontend/utils/app_colors.dart';
 
 class CustomTimeField extends StatefulWidget {
   final TimeOfDay? initialTime;
@@ -92,7 +93,7 @@ class _CustomTimeFieldState extends State<CustomTimeField> {
                     fontFamily: "Poppins-Medium",
                     fontSize: 14,
                     color: _selectedTime != null
-                        ? Colors.black
+                        ? AppColors.textPrimary
                         : Colors.grey.shade400,
                   ),
                 ),

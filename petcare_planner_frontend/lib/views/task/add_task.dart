@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
@@ -9,6 +10,9 @@ import 'package:petcare_planner_frontend/widgets/custom_date_picker.dart';
 import 'package:petcare_planner_frontend/widgets/custom_text_field.dart';
 import 'package:petcare_planner_frontend/widgets/custom_time_picker.dart';
 import 'package:petcare_planner_frontend/widgets/frequency_selector.dart';
+import 'package:petcare_planner_frontend/widgets/pet_card.dart';
+import 'package:petcare_planner_frontend/widgets/reminder_toggle.dart';
+import 'package:petcare_planner_frontend/widgets/task_type_card.dart';
 import 'package:provider/provider.dart';
 
 class AddTaskScreen extends StatelessWidget {
@@ -16,15 +20,9 @@ class AddTaskScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<TaskViewModel>(
-      create: (_) => context.read<TaskViewModel>(),
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: _AddTaskForm(),
-        ),
-      ),
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: const Padding(padding: EdgeInsets.all(16.0), child: _AddTaskForm()),
     );
   }
 }
@@ -53,6 +51,10 @@ class _AddTaskFormState extends State<_AddTaskForm> {
     notesController = TextEditingController();
     selectedDate = DateTime.now();
     selectedTime = TimeOfDay.now();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<PetViewModel>().fetchPets();
+    });
   }
 
   @override
@@ -64,7 +66,14 @@ class _AddTaskFormState extends State<_AddTaskForm> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, String>> taskTypes = [
+      {'label': 'Feeding', 'image': "assets/images/feeding.png"},
+      {'label': 'Walking', 'image': "assets/images/walking.png"},
+      {'label': 'Grooming', 'image': "assets/images/grooming.png"},
+      {'label': 'Medical', 'image': "assets/images/medical.png"},
+    ];
     final viewModel = context.watch<TaskViewModel>();
+    final petViewModel = context.watch<PetViewModel>();
 
     return SingleChildScrollView(
       child: Center(
@@ -73,12 +82,45 @@ class _AddTaskFormState extends State<_AddTaskForm> {
             const SizedBox(height: 60),
 
             /// --- TITLE ---
-            const Text(
-              "New Task",
-              style: TextStyle(
-                fontFamily: "Poppins-Bold",
-                fontSize: 20,
-                color: AppColors.textPrimary,
+            SizedBox(
+              width: 330,
+              child: Row(
+                children: [
+                  // --- Back Button on left ---
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x19000000),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.arrow_back, color: Colors.black),
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  // --- Center Title ---
+                  const Text(
+                    "New Task",
+                    style: TextStyle(
+                      fontFamily: "Poppins-Bold",
+                      fontSize: 20,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+
+                  const Spacer(flex: 2),
+                ],
               ),
             ),
 
@@ -135,7 +177,20 @@ class _AddTaskFormState extends State<_AddTaskForm> {
               ),
             ),
 
-            const SizedBox(height: 124),
+            const SizedBox(height: 2),
+
+            PetCard(
+              pets: petViewModel.pets,
+              selectedPetId: selectedPetId,
+              isLoading: petViewModel.isLoading,
+              onPetSelected: (id) {
+                setState(() {
+                  selectedPetId = id;
+                });
+              },
+            ),
+
+            const SizedBox(height: 14),
 
             /// --- Task Type ---
             SizedBox(
@@ -153,6 +208,29 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                     ),
                   ),
                 ),
+              ),
+            ),
+
+            const SizedBox(height: 2),
+
+            SizedBox(
+              width: 330,
+              height: 110,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (final taskType in taskTypes)
+                    TaskTypeCard(
+                      label: taskType['label']!,
+                      imagePath: taskType['image']!,
+                      selected: selectedTaskType == taskType['label'],
+                      onTap: () {
+                        setState(() {
+                          selectedTaskType = taskType['label'];
+                        });
+                      },
+                    ),
+                ],
               ),
             ),
 
@@ -330,7 +408,19 @@ class _AddTaskFormState extends State<_AddTaskForm> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+
+            SizedBox(
+              width: 330,
+              child: ReminderToggle(
+                initialValue: true,
+                onChanged: (value) {
+                  print("Reminder: $value");
+                },
+              ),
+            ),
+
+            const SizedBox(height: 24),
 
             /// --- SUBMIT BUTTON ---
             Container(
@@ -343,7 +433,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
               child: viewModel.isLoading
                   ? const CircularProgressIndicator()
                   : ActionButton(
-                      text: "Submit",
+                      text: "Create Task",
                       onPressed: () async {
                         final viewModel = context.read<TaskViewModel>();
 
