@@ -1,69 +1,92 @@
 import 'package:flutter/material.dart';
-import '../utils/app_colors.dart';
-import '../models/pet.dart';
+import 'package:petcare_planner_frontend/models/pet.dart';
+import 'package:petcare_planner_frontend/utils/app_colors.dart';
 
 class PetCard extends StatelessWidget {
-  final Pet pet;
-  final bool isSelected;
-  final VoidCallback onTap;
+  final List<Pet> pets;
+  final String? selectedPetId;
+  final bool isLoading;
+  final Function(String) onPetSelected;
 
   const PetCard({
     super.key,
-    required this.pet,
-    required this.isSelected,
-    required this.onTap,
+    required this.pets,
+    required this.selectedPetId,
+    required this.isLoading,
+    required this.onPetSelected,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 100,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: isSelected
-              ? Border.all(color: AppColors.primary, width: 2)
-              : null,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            _petAvatar(),
-            const SizedBox(height: 10),
-            Text(
-              pet.petName,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontFamily: "Poppins-Medium",
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+    return SizedBox(
+      width: 330,
+      height: 110,
+      child: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : pets.isEmpty
+          ? const Center(child: Text("No pets found"))
+          : ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: pets.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                final pet = pets[index];
+                final selected = selectedPetId == pet.id;
 
-  Widget _petAvatar() {
-    return CircleAvatar(
-      radius: 26,
-      backgroundColor: AppColors.background,
-      backgroundImage: pet.petImage != null && pet.petImage!.isNotEmpty
-          ? NetworkImage(pet.petImage!)
-          : null,
-      child: pet.petImage == null || pet.petImage!.isEmpty
-          ? const Icon(Icons.pets, size: 26)
-          : null,
+                return GestureDetector(
+                  onTap: () => onPetSelected(pet.id),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeInOut,
+                    width: 100,
+                    padding: const EdgeInsets.only(
+                      top: 12,
+                      left: 8,
+                      right: 8,
+                      bottom: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: selected ? AppColors.primary : Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(50),
+                          child: pet.petImage != null
+                              ? Image.network(
+                                  "http://localhost:3000/${pet.petImage}",
+                                  width: 56,
+                                  height: 56,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  "assets/images/default_pet.png",
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          pet.petName,
+                          style: TextStyle(
+                            fontFamily: "Poppins-Medium",
+                            fontSize: 13,
+                            color: selected
+                                ? AppColors.textSecondary
+                                : AppColors.textPrimary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

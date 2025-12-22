@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:petcare_planner_frontend/utils/app_colors.dart';
 
 class CustomDateField extends StatefulWidget {
   final DateTime? initialDate;
@@ -75,12 +76,7 @@ class _CustomDateFieldState extends State<CustomDateField> {
           ),
           child: Row(
             children: [
-              Image.asset(
-                widget.imageAssetPath,
-                width: 20,
-                height: 20,
-                fit: BoxFit.contain,
-              ),
+              Image.asset(widget.imageAssetPath, width: 20, height: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -89,7 +85,7 @@ class _CustomDateFieldState extends State<CustomDateField> {
                     fontFamily: "Poppins-Medium",
                     fontSize: 14,
                     color: _selectedDate != null
-                        ? Colors.black
+                        ? AppColors.textPrimary
                         : Colors.grey.shade400,
                   ),
                 ),

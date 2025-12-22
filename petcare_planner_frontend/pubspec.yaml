@@ -90,6 +90,10 @@ flutter:
     - assets/images/Other.png
     - assets/images/calendar.png
     - assets/images/clock.png
+    - assets/images/feeding.png
+    - assets/images/walking.png
+    - assets/images/grooming.png
+    - assets/images/medical.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

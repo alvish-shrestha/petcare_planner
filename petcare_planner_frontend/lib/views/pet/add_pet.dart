@@ -1,11 +1,8 @@
 // ignore_for_file: unused_element_parameter, unnecessary_underscores, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/repository/task_repository.dart';
-import 'package:petcare_planner_frontend/services/task_service.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
-import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
 import 'package:petcare_planner_frontend/views/task/add_task.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
@@ -365,12 +362,7 @@ class _AddPetFormState extends State<_AddPetForm> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => ChangeNotifierProvider(
-                                create: (_) => TaskViewModel(
-                                  TaskRepository(TaskService()),
-                                ),
-                                child: const AddTaskScreen(),
-                              ),
+                              builder: (_) => const AddTaskScreen(),
                             ),
                           );
                         } else {
