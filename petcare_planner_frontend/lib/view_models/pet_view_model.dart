@@ -2,14 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petcare_planner_frontend/models/pet.dart';
-import '../repositories/pet_repository.dart';
+import '../repository/pet_repository.dart';
 
 class PetViewModel extends ChangeNotifier {
   final PetRepository _repository;
 
   PetViewModel(this._repository);
 
-  // ---------------- STATE ----------------
   bool isLoading = false;
   String? errorMessage;
 
@@ -18,17 +17,11 @@ class PetViewModel extends ChangeNotifier {
 
   File? petImage;
 
-  // ---------------- CONTROLLERS ----------------
-  final petNameController = TextEditingController();
-  final breedController = TextEditingController();
-  final ageController = TextEditingController();
-
   String? petType;
   String? gender;
 
   final ImagePicker _picker = ImagePicker();
 
-  // ---------------- IMAGE PICKER ----------------
   Future<void> pickImage() async {
     final XFile? image = await _picker.pickImage(
       source: ImageSource.gallery,
@@ -51,22 +44,25 @@ class PetViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ---------------- ADD PET ----------------
-  Future<bool> addPet() async {
+  Future<bool> addPet({
+    required String petName,
+    required String breed,
+    required int age,
+  }) async {
     _setLoading(true);
-    _clearError();
+    errorMessage = null;
 
     try {
       await _repository.addPet(
         petType: petType!,
-        petName: petNameController.text.trim(),
-        breed: breedController.text.trim(),
-        age: int.parse(ageController.text),
+        petName: petName,
+        breed: breed,
+        age: age,
         gender: gender!,
         petImage: petImage,
       );
 
-      _resetForm();
+      _reset();
       return true;
     } catch (e) {
       errorMessage = e.toString();
@@ -76,103 +72,14 @@ class PetViewModel extends ChangeNotifier {
     }
   }
 
-  // ---------------- FETCH ALL PETS ----------------
-  Future<void> fetchAllPets() async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _repository.getAllPets();
-      final List data = response['pets'];
-
-      pets = data.map((e) => Pet.fromJson(e)).toList();
-    } catch (e) {
-      errorMessage = e.toString();
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  // ---------------- FETCH PET BY ID ----------------
-  Future<void> fetchPetById(String id) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _repository.getPetById(id);
-      selectedPet = Pet.fromJson(response['pet']);
-    } catch (e) {
-      errorMessage = e.toString();
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  // ---------------- UPDATE PET ----------------
-  Future<bool> updatePet(String id) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      await _repository.updatePet(
-        id: id,
-        petType: petType,
-        petName: petNameController.text.trim(),
-        breed: breedController.text.trim(),
-        age: int.parse(ageController.text),
-        gender: gender,
-        petImage: petImage,
-      );
-      return true;
-    } catch (e) {
-      errorMessage = e.toString();
-      return false;
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  // ---------------- DELETE PET ----------------
-  Future<bool> deletePet(String id) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      await _repository.deletePet(id);
-      pets.removeWhere((pet) => pet.id == id);
-      return true;
-    } catch (e) {
-      errorMessage = e.toString();
-      return false;
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  // ---------------- HELPERS ----------------
-  void _setLoading(bool value) {
-    isLoading = value;
-    notifyListeners();
-  }
-
-  void _clearError() {
-    errorMessage = null;
-  }
-
-  void _resetForm() {
-    petNameController.clear();
-    breedController.clear();
-    ageController.clear();
+  void _reset() {
     petType = null;
     gender = null;
     petImage = null;
   }
 
-  @override
-  void dispose() {
-    petNameController.dispose();
-    breedController.dispose();
-    ageController.dispose();
-    super.dispose();
+  void _setLoading(bool value) {
+    isLoading = value;
+    notifyListeners();
   }
 }

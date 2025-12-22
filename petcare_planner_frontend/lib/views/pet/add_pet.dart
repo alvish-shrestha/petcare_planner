@@ -1,8 +1,12 @@
 // ignore_for_file: unused_element_parameter, unnecessary_underscores, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/repository/task_repository.dart';
+import 'package:petcare_planner_frontend/services/task_service.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
+import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
+import 'package:petcare_planner_frontend/views/task/add_task.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/custom_dropdown.dart';
@@ -15,21 +19,40 @@ class AddPetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<PetViewModel>(
-      create: (_) => context.read<PetViewModel>(),
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: _AddPetForm(),
-        ),
-      ),
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: const Padding(padding: EdgeInsets.all(16.0), child: _AddPetForm()),
     );
   }
 }
 
-class _AddPetForm extends StatelessWidget {
+class _AddPetForm extends StatefulWidget {
   const _AddPetForm({super.key});
+
+  @override
+  State<_AddPetForm> createState() => _AddPetFormState();
+}
+
+class _AddPetFormState extends State<_AddPetForm> {
+  late final TextEditingController petNameController;
+  late final TextEditingController breedController;
+  late final TextEditingController ageController;
+
+  @override
+  void initState() {
+    super.initState();
+    petNameController = TextEditingController();
+    breedController = TextEditingController();
+    ageController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    petNameController.dispose();
+    breedController.dispose();
+    ageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -152,10 +175,9 @@ class _AddPetForm extends StatelessWidget {
               child: Center(
                 child: SizedBox(
                   height: 110,
-                  // Let ListView take minimum width required by children
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    shrinkWrap: true, // shrink to children width
+                    shrinkWrap: true,
                     itemCount: petTypes.length,
                     separatorBuilder: (_, __) => const SizedBox(width: 12),
                     itemBuilder: (_, index) {
@@ -199,7 +221,7 @@ class _AddPetForm extends StatelessWidget {
               height: 60,
               child: CustomTextField(
                 hint: "e.g. Max, Luna, Buddy",
-                controller: viewModel.petNameController,
+                controller: petNameController,
               ),
             ),
 
@@ -229,7 +251,7 @@ class _AddPetForm extends StatelessWidget {
               height: 60,
               child: CustomTextField(
                 hint: "e.g. Golden Retriever",
-                controller: viewModel.breedController,
+                controller: breedController,
               ),
             ),
 
@@ -264,7 +286,7 @@ class _AddPetForm extends StatelessWidget {
                       height: 60,
                       child: CustomTextField(
                         hint: "Years",
-                        controller: viewModel.ageController,
+                        controller: ageController,
                         keyboardType: TextInputType.number,
                       ),
                     ),
@@ -302,12 +324,61 @@ class _AddPetForm extends StatelessWidget {
                   : ActionButton(
                       text: "Submit",
                       onPressed: () async {
-                        final success = await viewModel.addPet();
+                        final viewModel = context.read<PetViewModel>();
+
+                        if (viewModel.petType == null ||
+                            viewModel.gender == null) {
+                          AppSnackBar.show(
+                            context,
+                            message: "Please select pet type and gender",
+                            type: SnackBarType.error,
+                          );
+                          return;
+                        }
+
+                        if (petNameController.text.isEmpty ||
+                            breedController.text.isEmpty ||
+                            ageController.text.isEmpty) {
+                          AppSnackBar.show(
+                            context,
+                            message: "All fields are required",
+                            type: SnackBarType.error,
+                          );
+                          return;
+                        }
+
+                        final success = await viewModel.addPet(
+                          petName: petNameController.text.trim(),
+                          breed: breedController.text.trim(),
+                          age: int.parse(ageController.text),
+                        );
+
+                        if (!mounted) return;
+
                         if (success) {
                           AppSnackBar.show(
                             context,
                             message: "Pet Added Successfully!",
                             type: SnackBarType.success,
+                          );
+
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChangeNotifierProvider(
+                                create: (_) => TaskViewModel(
+                                  TaskRepository(TaskService()),
+                                ),
+                                child: const AddTaskScreen(),
+                              ),
+                            ),
+                          );
+                        } else {
+                          AppSnackBar.show(
+                            context,
+                            message:
+                                viewModel.errorMessage ?? "Failed to add pet",
+                            type: SnackBarType.error,
                           );
                         }
                       },
