@@ -95,7 +95,7 @@ class GetStartedThree extends StatelessWidget {
                     text: "Get Started",
                     onPressed: () async {
                       final prefs = await SharedPreferences.getInstance();
-                      await prefs.setBool('seenOnboarding', true);
+                      await prefs.setBool('isFirstLaunch', false);
 
                       Navigator.pushReplacement(
                         context,

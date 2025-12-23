@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/views/get_started/get_started_third.dart';
 import 'package:petcare_planner_frontend/widgets/slide_fade_route.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
 import 'package:petcare_planner_frontend/views/get_started/get_started_two.dart';
@@ -79,7 +80,12 @@ class GetStartedOne extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        SlideFadeRoute(page: const GetStartedThree()),
+                      );
+                    },
                     child: const Text(
                       "Skip",
                       style: TextStyle(
