@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/widgets/slide_fade_route.dart';
 import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GetStartedThree extends StatelessWidget {
   const GetStartedThree({super.key});
@@ -90,8 +93,11 @@ class GetStartedThree extends StatelessWidget {
                   ),
                   child: ActionButton(
                     text: "Get Started",
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setBool('seenOnboarding', true);
+
+                      Navigator.pushReplacement(
                         context,
                         SlideFadeRoute(page: const AuthScreen()),
                       );
