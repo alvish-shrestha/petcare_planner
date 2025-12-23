@@ -5,11 +5,13 @@ import 'package:petcare_planner_frontend/repository/pet_repository.dart';
 import 'package:petcare_planner_frontend/services/pet_service.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
+import 'package:petcare_planner_frontend/views/dashboard/dashboard.dart';
 import 'package:petcare_planner_frontend/views/pet/add_pet.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/auth_text_field.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginForm extends StatelessWidget {
   final VoidCallback? onLoginSuccess;
@@ -121,24 +123,42 @@ class LoginForm extends StatelessWidget {
                                       type: SnackBarType.error,
                                     );
                                   } else if (authViewModel.user != null) {
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    await prefs.setBool('isLoggedIn', true);
+
                                     AppSnackBar.show(
                                       context,
                                       message: "Login Successful!",
                                       type: SnackBarType.success,
                                     );
 
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ChangeNotifierProvider(
-                                              create: (_) => PetViewModel(
-                                                PetRepository(PetService()),
-                                              ),
-                                              child: const AddPetScreen(),
-                                            ),
-                                      ),
+                                    final petViewModel = PetViewModel(
+                                      PetRepository(PetService()),
                                     );
+
+                                    await petViewModel.fetchPets();
+
+                                    if (petViewModel.pets.isEmpty) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              ChangeNotifierProvider.value(
+                                                value: petViewModel,
+                                                child: const AddPetScreen(),
+                                              ),
+                                        ),
+                                      );
+                                    } else {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const DashboardScreen(),
+                                        ),
+                                      );
+                                    }
 
                                     if (onLoginSuccess != null) {
                                       onLoginSuccess!();
