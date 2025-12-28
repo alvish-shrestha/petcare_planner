@@ -111,7 +111,6 @@ class _AuthScreenState extends State<AuthScreen> {
                                     //   context,
                                     //   '/home',
                                     // );
-                                    print("Login Successful");
                                   },
                                   emailController: loginEmailController,
                                   passwordController: loginPasswordController,
