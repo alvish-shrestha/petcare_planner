@@ -154,8 +154,7 @@ class LoginForm extends StatelessWidget {
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) =>
-                                              const DashboardScreen(),
+                                          builder: (_) => const DashboardView(),
                                         ),
                                       );
                                     }

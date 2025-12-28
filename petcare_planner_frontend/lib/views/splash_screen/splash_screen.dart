@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen>
       Navigator.pushReplacement(
         context,
         SlideFadeRoute(
-          page: isLoggedIn ? const DashboardScreen() : const AuthScreen(),
+          page: isLoggedIn ? const DashboardView() : const AuthScreen(),
         ),
       );
     }
