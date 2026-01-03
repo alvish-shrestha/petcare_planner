@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
+import 'package:petcare_planner_frontend/views/dashboard/dashboard.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/custom_date_picker.dart';
@@ -498,7 +499,13 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                             message: "Task added successfully!",
                             type: SnackBarType.success,
                           );
-                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const DashboardView(),
+                            ),
+                          );
+                          ;
                         }
                       },
                     ),

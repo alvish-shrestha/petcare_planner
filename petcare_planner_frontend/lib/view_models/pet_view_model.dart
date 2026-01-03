@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petcare_planner_frontend/models/pet.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../repository/pet_repository.dart';
 
 class PetViewModel extends ChangeNotifier {
@@ -14,6 +15,8 @@ class PetViewModel extends ChangeNotifier {
 
   List<Pet> pets = [];
   Pet? selectedPet;
+
+  static const String _selectedPetKey = 'selected_pet_id';
 
   File? petImage;
 
@@ -83,14 +86,35 @@ class PetViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Future<void> fetchPets() async {
+  //   _setLoading(true);
+  //   errorMessage = null;
+
+  //   try {
+  //     final response = await _repository.getAllPets();
+  //     if (response['success'] == true) {
+  //       pets = (response['pets'] as List).map((e) => Pet.fromJson(e)).toList();
+  //     } else {
+  //       errorMessage = response['message'] ?? 'Failed to load pets';
+  //     }
+  //   } catch (e) {
+  //     errorMessage = e.toString();
+  //   } finally {
+  //     _setLoading(false);
+  //   }
+  // }
+
   Future<void> fetchPets() async {
     _setLoading(true);
     errorMessage = null;
 
     try {
       final response = await _repository.getAllPets();
+
       if (response['success'] == true) {
         pets = (response['pets'] as List).map((e) => Pet.fromJson(e)).toList();
+
+        await _restoreSelectedPet();
       } else {
         errorMessage = response['message'] ?? 'Failed to load pets';
       }
@@ -98,6 +122,30 @@ class PetViewModel extends ChangeNotifier {
       errorMessage = e.toString();
     } finally {
       _setLoading(false);
+    }
+  }
+
+  Future<void> selectPet(Pet pet) async {
+    selectedPet = pet;
+    notifyListeners();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_selectedPetKey, pet.id);
+  }
+
+  Future<void> _restoreSelectedPet() async {
+    if (pets.isEmpty) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final savedPetId = prefs.getString(_selectedPetKey);
+
+    if (savedPetId != null) {
+      selectedPet = pets.firstWhere(
+        (pet) => pet.id == savedPetId,
+        orElse: () => pets.first,
+      );
+    } else {
+      selectedPet = pets.first;
     }
   }
 }
