@@ -54,8 +54,7 @@ class Home extends StatelessWidget {
                 // --- Notification ---
                 GestureDetector(
                   onTap: () {
-                    // TODO: Notification
-                    print("Notificaton clicked");
+                    // TODO
                   },
                   child: Container(
                     height: 40,

@@ -78,7 +78,7 @@ class LoginForm extends StatelessWidget {
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
                             onTap: () {
-                              // TODO: Navigate to Forgot Password screen
+                              // TODO
                             },
                             child: Text(
                               "Forgot Password?",
