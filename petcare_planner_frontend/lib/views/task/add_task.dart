@@ -416,7 +416,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
               child: ReminderToggle(
                 initialValue: true,
                 onChanged: (value) {
-                  print("Reminder: $value");
+                  // TODO
                 },
               ),
             ),
@@ -505,7 +505,6 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                               builder: (_) => const DashboardView(),
                             ),
                           );
-                          ;
                         }
                       },
                     ),
