@@ -40,7 +40,7 @@ class Task {
   Map<String, dynamic> toJson() {
     return {
       'taskTitle': taskTitle,
-      'petId': pet,
+      'petId': pet.id,
       'taskType': taskType,
       'date': date.toIso8601String(),
       'time': time,
