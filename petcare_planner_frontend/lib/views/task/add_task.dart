@@ -89,7 +89,9 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                 children: [
                   // --- Back Button on left ---
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                     child: Container(
                       height: 40,
                       width: 40,
