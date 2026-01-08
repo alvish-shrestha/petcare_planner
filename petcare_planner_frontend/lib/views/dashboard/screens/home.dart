@@ -4,6 +4,8 @@ import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
+import 'package:petcare_planner_frontend/views/task/add_task.dart';
+import 'package:petcare_planner_frontend/widgets/add_task_button.dart';
 import 'package:petcare_planner_frontend/widgets/pet_details_card.dart';
 import 'package:petcare_planner_frontend/widgets/task_list_view.dart';
 import 'package:provider/provider.dart';
@@ -75,149 +77,169 @@ class Home extends StatelessWidget {
     });
 
     return Center(
-      child: Column(
-        children: [
-          const SizedBox(height: 80),
-
-          /// --- Time of the day ---
-          SizedBox(
-            width: 330,
-            child: Text(
-              _getGreeting(),
-              style: TextStyle(
-                fontFamily: "Poppins",
-                fontSize: 14,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
-
-          /// --- Username ---
-          SizedBox(
-            width: 330,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: SizedBox(
+        width: 340,
+        child: Stack(
+          children: [
+            Column(
               children: [
-                Consumer<AuthViewModel>(
-                  builder: (context, authVM, _) {
-                    final username = authVM.user?.username ?? 'User';
-                    return Text(
-                      'Hi, $username! 👋',
-                      style: const TextStyle(
-                        fontFamily: "Poppins-Bold",
-                        fontSize: 24,
-                        color: AppColors.textPrimary,
+                const SizedBox(height: 80),
+
+                /// --- Time of the day ---
+                SizedBox(
+                  width: 330,
+                  child: Text(
+                    _getGreeting(),
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+
+                /// --- Username ---
+                SizedBox(
+                  width: 330,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Consumer<AuthViewModel>(
+                        builder: (context, authVM, _) {
+                          final username = authVM.user?.username ?? 'User';
+                          return Text(
+                            'Hi, $username! 👋',
+                            style: const TextStyle(
+                              fontFamily: "Poppins-Bold",
+                              fontSize: 24,
+                              color: AppColors.textPrimary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          );
+                        },
                       ),
-                      overflow: TextOverflow.ellipsis,
+
+                      /// --- Notification Icon ---
+                      Transform.translate(
+                        offset: const Offset(0, -8),
+                        child: GestureDetector(
+                          onTap: () {
+                            print("Notification Tapped");
+                          },
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x20000000),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.notifications,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                /// --- PET DETAILS CARD ---
+                Consumer<PetViewModel>(
+                  builder: (context, petVM, _) {
+                    if (petVM.isLoading) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    if (petVM.selectedPet == null) {
+                      return const SizedBox();
+                    }
+
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      final taskVM = context.read<TaskViewModel>();
+                      taskVM.fetchTasks(petId: petVM.selectedPet!.id);
+                    });
+
+                    return GestureDetector(
+                      onTap: () => _showPetSelector(context),
+                      child: PetDetailsCard(pet: petVM.selectedPet!),
                     );
                   },
                 ),
 
-                /// --- Notification Icon ---
-                Transform.translate(
-                  offset: const Offset(0, -8),
-                  child: GestureDetector(
-                    onTap: () {
-                      // TODO: handle notification tap
-                      print("Notification Tapped");
-                    },
-                    child: Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x20000000),
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.notifications,
-                        color: AppColors.primary,
-                      ),
+                const SizedBox(height: 20),
+
+                /// --- TODAY'S CARE PLAN ---
+                SizedBox(
+                  width: 330,
+                  child: const Text(
+                    "Today's Care Plan",
+                    style: TextStyle(
+                      fontFamily: "Poppins-Bold",
+                      fontSize: 18,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+
+                /// --- TASK CARD ---
+                Expanded(
+                  child: SizedBox(
+                    width: 340,
+                    child: Consumer<TaskViewModel>(
+                      builder: (context, taskVM, _) {
+                        final today = DateTime.now();
+                        final todayDateOnly = DateTime(
+                          today.year,
+                          today.month,
+                          today.day,
+                        );
+
+                        final todayTasks = taskVM.tasks.where((task) {
+                          final localDate = task.date.toLocal();
+                          final taskDateOnly = DateTime(
+                            localDate.year,
+                            localDate.month,
+                            localDate.day,
+                          );
+                          return taskDateOnly == todayDateOnly;
+                        }).toList();
+
+                        return TaskListView(tasks: todayTasks);
+                      },
                     ),
                   ),
                 ),
               ],
             ),
-          ),
 
-          SizedBox(height: 20),
-
-          /// --- PET DETAILS CARD ---
-          Consumer<PetViewModel>(
-            builder: (context, petVM, _) {
-              if (petVM.isLoading) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
-                  child: CircularProgressIndicator(),
-                );
-              }
-
-              if (petVM.selectedPet == null) {
-                return const SizedBox();
-              }
-
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                final taskVM = context.read<TaskViewModel>();
-                taskVM.fetchTasks(petId: petVM.selectedPet!.id);
-              });
-
-              return GestureDetector(
-                onTap: () => _showPetSelector(context),
-                child: PetDetailsCard(pet: petVM.selectedPet!),
-              );
-            },
-          ),
-
-          const SizedBox(height: 20),
-
-          /// --- TODAY'S CARE PLAN ---
-          SizedBox(
-            width: 330,
-            child: const Text(
-              "Today's Care Plan",
-              style: TextStyle(
-                fontFamily: "Poppins-Bold",
-                fontSize: 18,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
-
-          /// --- TASK CARD ---
-          Expanded(
-            child: SizedBox(
-              width: 340,
-              child: Consumer<TaskViewModel>(
-                builder: (context, taskVM, _) {
-                  final today = DateTime.now();
-                  final todayDateOnly = DateTime(
-                    today.year,
-                    today.month,
-                    today.day,
+            /// --- Add Task Button ---
+            Positioned(
+              bottom: 24,
+              right: 0,
+              child: AddTaskButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AddTaskScreen()),
                   );
-
-                  final todayTasks = taskVM.tasks.where((task) {
-                    final localDate = task.date.toLocal();
-                    final taskDateOnly = DateTime(
-                      localDate.year,
-                      localDate.month,
-                      localDate.day,
-                    );
-                    return taskDateOnly == todayDateOnly;
-                  }).toList();
-
-                  return TaskListView(tasks: todayTasks);
                 },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

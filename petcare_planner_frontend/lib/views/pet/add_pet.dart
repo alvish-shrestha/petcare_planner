@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
-import 'package:petcare_planner_frontend/views/task/add_task.dart';
+import 'package:petcare_planner_frontend/views/dashboard/dashboard.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/custom_dropdown.dart';
@@ -362,7 +362,7 @@ class _AddPetFormState extends State<_AddPetForm> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const AddTaskScreen(),
+                              builder: (_) => const DashboardView(),
                             ),
                           );
                         } else {
