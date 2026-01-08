@@ -16,8 +16,8 @@ class TaskListView extends StatelessWidget {
         child: Text(
           "No tasks scheduled for today",
           style: TextStyle(
-            fontFamily: "Poppins",
-            color: AppColors.textSecondary,
+            fontFamily: "Poppins-Bold",
+            color: AppColors.textPrimary.withAlpha(100),
           ),
         ),
       );
