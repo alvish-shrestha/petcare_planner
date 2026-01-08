@@ -49,11 +49,15 @@ class TaskViewModel extends ChangeNotifier {
 
   /// --- Fetch Tasks ---
   Future<void> fetchTasks({String? petId}) async {
+    print("Fetching tasks for petId: $petId");
+    if (petId == null) return;
     _setLoading(true);
 
     try {
       final response = await _repository.getAllTasks(petId: petId);
       tasks = (response['tasks'] as List).map((e) => Task.fromJson(e)).toList();
+
+      notifyListeners();
     } catch (e) {
       errorMessage = e.toString();
     } finally {
@@ -81,5 +85,17 @@ class TaskViewModel extends ChangeNotifier {
   void _setLoading(bool value) {
     isLoading = value;
     notifyListeners();
+  }
+
+  /// --- Today's Task ---
+  List<Task> get todaysTasks {
+    final today = DateTime.now();
+
+    return tasks.where((task) {
+      final taskLocalDate = task.date.toLocal();
+      return taskLocalDate.year == today.year &&
+          taskLocalDate.month == today.month &&
+          taskLocalDate.day == today.day;
+    }).toList()..sort((a, b) => a.time.compareTo(b.time));
   }
 }

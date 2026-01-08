@@ -147,5 +147,6 @@ class PetViewModel extends ChangeNotifier {
     } else {
       selectedPet = pets.first;
     }
+    notifyListeners();
   }
 }

@@ -45,6 +45,7 @@ class TaskService {
         : Uri.parse('${ApiConfig.baseUrl}/api/task/get-all-task');
 
     final response = await http.get(uri);
+    print('getAllTasks response: ${response.body}');
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);

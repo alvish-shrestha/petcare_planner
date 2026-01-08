@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/utils/api_utils.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
+import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/pet_details_card.dart';
+import 'package:petcare_planner_frontend/widgets/task_list_view.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
@@ -11,9 +13,9 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final vm = context.read<PetViewModel>();
-      if (vm.pets.isEmpty && !vm.isLoading) {
-        vm.fetchPets();
+      final petVM = context.read<PetViewModel>();
+      if (petVM.pets.isEmpty && !petVM.isLoading) {
+        petVM.fetchPets();
       }
     });
 
@@ -81,27 +83,33 @@ class Home extends StatelessWidget {
 
           /// --- PET DETAILS CARD ---
           Consumer<PetViewModel>(
-            builder: (context, vm, _) {
-              if (vm.isLoading) {
+            builder: (context, petVM, _) {
+              if (petVM.isLoading) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
                   child: CircularProgressIndicator(),
                 );
               }
 
-              if (vm.selectedPet == null) {
+              if (petVM.selectedPet == null) {
                 return const SizedBox();
               }
 
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final taskVM = context.read<TaskViewModel>();
+                taskVM.fetchTasks(petId: petVM.selectedPet!.id);
+              });
+
               return GestureDetector(
                 onTap: () => _showPetSelector(context),
-                child: PetDetailsCard(pet: vm.selectedPet!),
+                child: PetDetailsCard(pet: petVM.selectedPet!),
               );
             },
           ),
 
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
 
+          /// --- TODAY'S CARE PLAN ---
           SizedBox(
             width: 330,
             child: const Text(
@@ -110,6 +118,35 @@ class Home extends StatelessWidget {
                 fontFamily: "Poppins-Bold",
                 fontSize: 18,
                 color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+
+          /// --- TASK CARD ---
+          Expanded(
+            child: SizedBox(
+              width: 340,
+              child: Consumer<TaskViewModel>(
+                builder: (context, taskVM, _) {
+                  final today = DateTime.now();
+                  final todayDateOnly = DateTime(
+                    today.year,
+                    today.month,
+                    today.day,
+                  );
+
+                  final todayTasks = taskVM.tasks.where((task) {
+                    final localDate = task.date.toLocal();
+                    final taskDateOnly = DateTime(
+                      localDate.year,
+                      localDate.month,
+                      localDate.day,
+                    );
+                    return taskDateOnly == todayDateOnly;
+                  }).toList();
+
+                  return TaskListView(tasks: todayTasks);
+                },
               ),
             ),
           ),
