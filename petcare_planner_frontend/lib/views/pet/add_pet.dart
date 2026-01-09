@@ -353,6 +353,8 @@ class _AddPetFormState extends State<_AddPetForm> {
                         if (!mounted) return;
 
                         if (success) {
+                          await viewModel.fetchPets();
+
                           AppSnackBar.show(
                             context,
                             message: "Pet Added Successfully!",

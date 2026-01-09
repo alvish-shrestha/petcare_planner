@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:petcare_planner_frontend/utils/api_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PetService {
   /// --- ADD PET (with image) ---
@@ -16,6 +17,9 @@ class PetService {
     final uri = Uri.parse('${ApiConfig.baseUrl}/api/pet/add-pet');
 
     final request = http.MultipartRequest('POST', uri);
+
+    final token = await _getTokenFromStorage();
+    request.headers['Authorization'] = 'Bearer $token';
 
     request.fields.addAll({
       'petType': petType,
@@ -44,9 +48,14 @@ class PetService {
 
   /// --- GET ALL PETS ---
   Future<Map<String, dynamic>> getAllPets() async {
+    final token = await _getTokenFromStorage();
+
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/api/pet/get-all-pet'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 200) {
@@ -60,9 +69,14 @@ class PetService {
 
   /// --- GET PET BY ID ---
   Future<Map<String, dynamic>> getPetById(String id) async {
+    final token = await _getTokenFromStorage();
+
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/api/pet/get-pet-by-id/$id'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 200) {
@@ -85,6 +99,9 @@ class PetService {
     final uri = Uri.parse('${ApiConfig.baseUrl}/api/pet/update-pet/$id');
 
     final request = http.MultipartRequest('PUT', uri);
+
+    final token = await _getTokenFromStorage();
+    request.headers['Authorization'] = 'Bearer $token';
 
     if (petType != null) request.fields['petType'] = petType;
     if (petName != null) request.fields['petName'] = petName;
@@ -111,9 +128,14 @@ class PetService {
 
   /// --- DELETE PET ---
   Future<Map<String, dynamic>> deletePet(String id) async {
+    final token = await _getTokenFromStorage();
+
     final response = await http.delete(
       Uri.parse('${ApiConfig.baseUrl}/api/pet/delete-pet/$id'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 200) {
@@ -123,5 +145,10 @@ class PetService {
         jsonDecode(response.body)['message'] ?? 'Failed to delete pet',
       );
     }
+  }
+
+  Future<String?> _getTokenFromStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
   }
 }
