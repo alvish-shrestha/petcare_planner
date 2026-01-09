@@ -1,6 +1,9 @@
 const Pet = require("../models/Pet");
 const fs = require("fs");
 const path = require("path");
+const Badge = require("../models/Badge");
+const UserBadge = require("../models/UserBadge");
+const Milestone = require("../models/Milestone");
 
 // --- Add Pet ---
 exports.addPet = async (req, res) => {
@@ -56,15 +59,44 @@ exports.addPet = async (req, res) => {
     }
 
     const newPet = new Pet({
+      userId: req.user._id,
       petImage,
       petType: petType,
-      petName: petName.toLowerCase(),
-      breed: breed.toLowerCase(),
+      petName: petName,
+      breed: breed,
       age: parsedAge,
       gender: gender,
     });
 
     await newPet.save();
+
+    /// --- REWARD LOGIC ---
+    const petCount = await Pet.countDocuments({ userId: req.user._id });
+
+    /// --- First Pet Badge ---
+    if (petCount === 1) {
+      const badge = await Badge.findOne({ title: "First Pet" });
+
+      if (badge) {
+        const alreadyUnlocked = await UserBadge.findOne({
+          userId: req.user._id,
+          badgeId: badge._id,
+        });
+
+        if (!alreadyUnlocked) {
+          await UserBadge.create({
+            userId: req.user._id,
+            badgeId: badge._id,
+          });
+
+          await Milestone.create({
+            userId: req.user._id,
+            title: "First Pet Added",
+            description: "Started your pet care journey",
+          });
+        }
+      }
+    }
 
     return res.status(201).json({
       success: true,

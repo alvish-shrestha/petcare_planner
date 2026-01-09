@@ -1,5 +1,5 @@
-const Task = require("../models/Task");
 const mongoose = require("mongoose");
+const Task = require("../models/Task");
 
 // --- Create Task ---
 exports.createTask = async (req, res) => {
@@ -13,7 +13,15 @@ exports.createTask = async (req, res) => {
       repeat = "None",
       notes,
       reminder = true,
+      status,
     } = req.body;
+
+    if (status !== undefined && !["pending", "completed"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status",
+      });
+    }
 
     if (!taskTitle || !petId || !taskType || !date || !time) {
       return res.status(400).json({
@@ -62,6 +70,7 @@ exports.createTask = async (req, res) => {
     }
 
     const newTask = new Task({
+      userId: req.user._id,
       taskTitle,
       petId,
       taskType,
@@ -70,6 +79,7 @@ exports.createTask = async (req, res) => {
       repeat,
       notes,
       reminder,
+      status: status || "pending",
     });
 
     await newTask.save();
@@ -91,7 +101,9 @@ exports.createTask = async (req, res) => {
 // --- Get All Tasks ---
 exports.getAllTasks = async (req, res) => {
   try {
-    const filter = {};
+    const filter = {
+      userId: req.user._id,
+    };
 
     if (req.query.petId) {
       if (!mongoose.Types.ObjectId.isValid(req.query.petId)) {
@@ -130,7 +142,10 @@ exports.getTaskById = async (req, res) => {
       });
     }
 
-    const task = await Task.findById(taskId).populate("petId");
+    const task = await Task.findOne({
+      _id: taskId,
+      userId: req.user._id,
+    }).populate("petId");
 
     if (!task) {
       return res.status(404).json({
@@ -165,8 +180,17 @@ exports.updateTask = async (req, res) => {
     }
 
     const updateData = {};
-    const { taskTitle, petId, taskType, date, time, repeat, notes, reminder } =
-      req.body;
+    const {
+      taskTitle,
+      petId,
+      taskType,
+      date,
+      time,
+      repeat,
+      notes,
+      reminder,
+      status,
+    } = req.body;
 
     if (taskTitle !== undefined) updateData.taskTitle = taskTitle;
 
@@ -203,6 +227,8 @@ exports.updateTask = async (req, res) => {
     }
 
     if (time !== undefined) updateData.time = time;
+    if (notes !== undefined) updateData.notes = notes;
+    if (reminder !== undefined) updateData.reminder = reminder;
 
     if (repeat !== undefined) {
       const validRepeats = ["None", "Daily", "Weekly", "Monthly"];
@@ -215,19 +241,31 @@ exports.updateTask = async (req, res) => {
       updateData.repeat = repeat;
     }
 
-    if (notes !== undefined) updateData.notes = notes;
+    if (status !== undefined) {
+      if (!["pending", "completed"].includes(status)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid status",
+        });
+      }
+      updateData.status = status;
+    }
 
-    if (reminder !== undefined) updateData.reminder = reminder;
-
-    const updatedTask = await Task.findByIdAndUpdate(taskId, updateData, {
-      new: true,
-    }).populate("petId");
+    const updatedTask = await Task.findOneAndUpdate(
+      { _id: taskId, userId: req.user._id },
+      updateData,
+      { new: true }
+    ).populate("petId");
 
     if (!updatedTask) {
       return res.status(404).json({
         success: false,
         message: "Task not found",
       });
+    }
+
+    if (status === "completed") {
+      await rewardService.evaluate(req.user._id);
     }
 
     return res.status(200).json({
@@ -256,7 +294,10 @@ exports.deleteTask = async (req, res) => {
       });
     }
 
-    const deletedTask = await Task.findByIdAndDelete(taskId);
+    const deletedTask = await Task.findOneAndDelete({
+      _id: taskId,
+      userId: req.user._id,
+    });
 
     if (!deletedTask) {
       return res.status(404).json({
