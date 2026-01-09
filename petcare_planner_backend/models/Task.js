@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const TaskSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     taskTitle: {
       type: String,
       required: true,
@@ -35,6 +40,11 @@ const TaskSchema = new mongoose.Schema(
     reminder: {
       type: Boolean,
       default: false,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "completed"],
+      default: "pending",
     },
   },
   {
