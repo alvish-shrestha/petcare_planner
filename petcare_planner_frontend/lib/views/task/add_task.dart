@@ -86,34 +86,31 @@ class _AddTaskFormState extends State<_AddTaskForm> {
             SizedBox(
               width: 330,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // --- Back Button on left ---
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x19000000),
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.arrow_back, color: Colors.black),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0x19000000),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.chevron_left, color: Colors.black),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
                   ),
-
-                  const Spacer(),
-
-                  // --- Center Title ---
-                  const Text(
+                  Text(
                     "New Task",
                     style: TextStyle(
                       fontFamily: "Poppins-Bold",
@@ -121,8 +118,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                       color: AppColors.textPrimary,
                     ),
                   ),
-
-                  const Spacer(flex: 2),
+                  const SizedBox(width: 40),
                 ],
               ),
             ),
