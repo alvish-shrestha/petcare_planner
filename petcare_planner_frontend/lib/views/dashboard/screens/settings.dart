@@ -60,7 +60,7 @@ class Settings extends StatelessWidget {
                         );
                         await authVM.logout();
 
-                        AppSnackBar.showCentered(
+                        AppSnackBar.show(
                           context,
                           message: "Logged out successfully",
                           type: SnackBarType.success,
@@ -90,14 +90,16 @@ class Settings extends StatelessWidget {
                     onAvatarTap: () async {
                       try {
                         await authVM.pickAndUploadProfileImage();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Profile image updated!')),
+                        AppSnackBar.show(
+                          context,
+                          message: "Profile Image Uploaded",
+                          type: SnackBarType.success,
                         );
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Failed to update profile image: $e'),
-                          ),
+                        AppSnackBar.show(
+                          context,
+                          message: "Failed to update profile image: $e",
+                          type: SnackBarType.error,
                         );
                       }
                     },

@@ -325,7 +325,7 @@ class _AddPetFormState extends State<_AddPetForm> {
 
                         if (viewModel.petType == null ||
                             viewModel.gender == null) {
-                          AppSnackBar.showCentered(
+                          AppSnackBar.show(
                             context,
                             message: "Please select pet type and gender",
                             type: SnackBarType.error,
@@ -336,9 +336,19 @@ class _AddPetFormState extends State<_AddPetForm> {
                         if (petNameController.text.isEmpty ||
                             breedController.text.isEmpty ||
                             ageController.text.isEmpty) {
-                          AppSnackBar.showCentered(
+                          AppSnackBar.show(
                             context,
                             message: "All fields are required",
+                            type: SnackBarType.error,
+                          );
+                          return;
+                        }
+
+                        final age = int.tryParse(ageController.text);
+                        if (age == null) {
+                          AppSnackBar.show(
+                            context,
+                            message: "Please enter a valid age",
                             type: SnackBarType.error,
                           );
                           return;
@@ -347,7 +357,7 @@ class _AddPetFormState extends State<_AddPetForm> {
                         final success = await viewModel.addPet(
                           petName: petNameController.text.trim(),
                           breed: breedController.text.trim(),
-                          age: int.parse(ageController.text),
+                          age: age,
                         );
 
                         if (!mounted) return;
@@ -355,20 +365,20 @@ class _AddPetFormState extends State<_AddPetForm> {
                         if (success) {
                           await viewModel.fetchPets();
 
-                          AppSnackBar.showCentered(
-                            context,
-                            message: "Pet Added Successfully!",
-                            type: SnackBarType.success,
-                          );
-
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (_) => const DashboardView(),
                             ),
                           );
+
+                          AppSnackBar.show(
+                            context,
+                            message: "Pet Added Successfully!",
+                            type: SnackBarType.success,
+                          );
                         } else {
-                          AppSnackBar.showCentered(
+                          AppSnackBar.show(
                             context,
                             message:
                                 viewModel.errorMessage ?? "Failed to add pet",
