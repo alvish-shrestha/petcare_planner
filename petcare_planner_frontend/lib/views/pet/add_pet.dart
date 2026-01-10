@@ -67,16 +67,52 @@ class _AddPetFormState extends State<_AddPetForm> {
           children: [
             const SizedBox(height: 60),
 
-            /// --- TITLE ---
-            const Text(
-              "Add Your Pet",
-              style: TextStyle(
-                fontFamily: "Poppins-Bold",
-                fontSize: 36,
-                color: AppColors.textPrimary,
+            SizedBox(
+              width: 350,
+              child: Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // --- Back Button ---
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x19000000),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(Icons.chevron_left, color: Colors.black),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 35),
+                        child: const Text(
+                          "Add Your Pet",
+                          style: TextStyle(
+                            fontFamily: "Poppins-Bold",
+                            fontSize: 36,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
+            /// --- TITLE ---
             const SizedBox(height: 5),
 
             const Text(
