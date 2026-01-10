@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/utils/api_utils.dart';
+import 'package:petcare_planner_frontend/utils/pet_api_utils.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
@@ -47,7 +47,7 @@ class Home extends StatelessWidget {
             return ListTile(
               leading: CircleAvatar(
                 backgroundImage: pet.petImage != null
-                    ? NetworkImage(ApiUtils.getFullImageUrl(pet.petImage!))
+                    ? NetworkImage(PetApiUtils.getFullImageUrl(pet.petImage!))
                     : null,
                 child: pet.petImage == null ? const Icon(Icons.pets) : null,
               ),

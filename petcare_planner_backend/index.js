@@ -20,8 +20,12 @@ connectDB();
 
 app.use(express.json());
 
-// Serve uploads folder statically to access pet images
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// --- Serve uploads folder statically ---
+app.use("/uploads/pets", express.static(path.join(__dirname, "uploads/pets")));
+app.use(
+  "/uploads/profiles",
+  express.static(path.join(__dirname, "uploads/profiles"))
+);
 
 // ------------------ Routes ------------------
 // --- User Routes ---

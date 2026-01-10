@@ -1,15 +1,24 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:petcare_planner_frontend/models/user.dart';
+import 'package:petcare_planner_frontend/repository/auth_repository.dart';
 import 'package:petcare_planner_frontend/services/auth_service.dart';
+import 'package:petcare_planner_frontend/utils/api_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final AuthService _authService = AuthService();
+  late final AuthRepository _authRepository;
+
+  User? _user;
+  String? _token;
 
   bool _isLoading = false;
   String? _errorMessage;
-  User? _user;
-  String? _token;
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -18,6 +27,7 @@ class AuthViewModel extends ChangeNotifier {
   String? get token => _token;
 
   AuthViewModel() {
+    _authRepository = AuthRepository(_authService);
     _loadUserFromPrefsOnInit();
   }
 
@@ -31,7 +41,11 @@ class AuthViewModel extends ChangeNotifier {
       prefs.setString('token', _token!);
       prefs.setString('username', _user!.username);
       prefs.setString('email', _user!.email);
-      // You can save more user data as needed, possibly as JSON string
+      if (_user!.profileImageUrl != null) {
+        prefs.setString('profileImageUrl', _user!.profileImageUrl!);
+      } else {
+        prefs.remove('profileImageUrl');
+      }
     }
   }
 
@@ -40,10 +54,17 @@ class AuthViewModel extends ChangeNotifier {
     final token = prefs.getString('token');
     final username = prefs.getString('username');
     final email = prefs.getString('email');
+    final profileImageUrl = prefs.getString('profileImageUrl');
 
     if (token != null && username != null && email != null) {
       _token = token;
-      _user = User(username: username, email: email, id: '', token: '');
+      _user = User(
+        username: username,
+        email: email,
+        id: '',
+        token: '',
+        profileImageUrl: profileImageUrl,
+      );
       notifyListeners();
     }
   }
@@ -98,6 +119,71 @@ class AuthViewModel extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> logout() async {
+    try {
+      await _authRepository.logout();
+
+      _user = null;
+      _token = null;
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Logout error: $e');
+    }
+  }
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> pickAndUploadProfileImage() async {
+    if (_token == null || _user == null) {
+      throw Exception('User not logged in');
+    }
+
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+      );
+
+      if (pickedFile == null) {
+        return;
+      }
+
+      File imageFile = File(pickedFile.path);
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${ApiConfig.baseUrl}/api/auth/profile-image'),
+      );
+
+      request.headers['Authorization'] = 'Bearer $_token';
+
+      request.files.add(
+        await http.MultipartFile.fromPath('profileImage', imageFile.path),
+      );
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        var respStr = await response.stream.bytesToString();
+        final jsonResp = jsonDecode(respStr);
+
+        if (jsonResp['success'] == true) {
+          _user = _user!.copyWith(profileImageUrl: jsonResp['imageUrl']);
+          await saveUserToPrefs();
+          notifyListeners();
+        } else {
+          throw Exception(jsonResp['message'] ?? 'Upload failed');
+        }
+      } else {
+        throw Exception(
+          'Failed to upload image, status: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Error picking/uploading image: $e');
     }
   }
 }

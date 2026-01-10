@@ -6,7 +6,7 @@ const {
   updatePet,
   deletePet,
 } = require("../controllers/petController");
-const upload = require("../middleware/uploadImage");
+const upload = require("../middleware/uploadPetImage");
 const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
