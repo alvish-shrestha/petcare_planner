@@ -365,17 +365,17 @@ class _AddPetFormState extends State<_AddPetForm> {
                         if (success) {
                           await viewModel.fetchPets();
 
+                          AppSnackBar.show(
+                            context,
+                            message: "Pet Added Successfully!",
+                            type: SnackBarType.success,
+                          );
+
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (_) => const DashboardView(),
                             ),
-                          );
-
-                          AppSnackBar.show(
-                            context,
-                            message: "Pet Added Successfully!",
-                            type: SnackBarType.success,
                           );
                         } else {
                           AppSnackBar.show(
