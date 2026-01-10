@@ -16,6 +16,11 @@ class RewardSummary {
       toUnlock: json['toUnlock'],
     );
   }
+
+  @override
+  String toString() {
+    return 'RewardSummary(totalBadges: $totalBadges, unlocked: $unlocked, toUnlock: $toUnlock)';
+  }
 }
 
 class UserBadge {
@@ -34,12 +39,14 @@ class UserBadge {
   });
 
   factory UserBadge.fromJson(Map<String, dynamic> json) {
+    final badgeData = json['badgeId'];
+
     return UserBadge(
-      id: json['_id'],
-      title: json['badgeId']['title'],
-      icon: json['badgeId']['icon'],
-      description: json['badgeId']['description'] ?? '',
-      unlockedAt: DateTime.parse(json['unlockedAt']),
+      id: json['_id'] ?? '',
+      title: badgeData?['title'] ?? '',
+      icon: badgeData?['icon'] ?? '',
+      description: badgeData?['description'] ?? '',
+      unlockedAt: DateTime.parse(json['createdAt']),
     );
   }
 }
@@ -62,7 +69,7 @@ class Milestone {
       id: json['_id'],
       title: json['title'],
       description: json['description'] ?? '',
-      achievedAt: DateTime.parse(json['achievedAt']),
+      achievedAt: DateTime.parse(json['createdAt']),
     );
   }
 }

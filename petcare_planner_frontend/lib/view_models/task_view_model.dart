@@ -49,7 +49,6 @@ class TaskViewModel extends ChangeNotifier {
 
   /// --- Fetch Tasks ---
   Future<void> fetchTasks({String? petId}) async {
-    print("Fetching tasks for petId: $petId");
     if (petId == null) return;
     _setLoading(true);
 

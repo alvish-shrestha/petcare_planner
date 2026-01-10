@@ -93,8 +93,6 @@ class AuthViewModel extends ChangeNotifier {
       _token = result['token'];
 
       await saveUserToPrefs();
-
-      print('Logged in user: ${_user?.username}');
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
     } finally {

@@ -78,7 +78,6 @@ class Rewards extends StatelessWidget {
                               color: AppColors.primary,
                             ),
                             onPressed: () {
-                              print("Share clicked");
                               final badgeCount = summary?.totalBadges ?? 0;
                               final unlockedCount = summary?.unlocked ?? 0;
                               final milestonesCount = milestones.length;
@@ -171,14 +170,16 @@ class Rewards extends StatelessWidget {
                     const SizedBox(height: 8),
 
                     badges.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            child: Text(
-                              "No badges earned yet.",
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                color: AppColors.textSecondary,
-                                fontSize: 14,
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: Text(
+                                "No badges earned yet.",
+                                style: TextStyle(
+                                  fontFamily: "Poppins",
+                                  color: AppColors.textPrimary,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
                           )
@@ -209,6 +210,7 @@ class Rewards extends StatelessWidget {
                                         Container(
                                           height: 72,
                                           width: 72,
+                                          alignment: Alignment.center,
                                           decoration: BoxDecoration(
                                             color: AppColors.primary,
                                             shape: BoxShape.circle,
@@ -222,10 +224,11 @@ class Rewards extends StatelessWidget {
                                               ),
                                             ],
                                           ),
-                                          child: Icon(
-                                            Icons.pets,
-                                            size: 40,
-                                            color: Colors.redAccent,
+                                          child: Text(
+                                            badge.icon,
+                                            style: const TextStyle(
+                                              fontSize: 40,
+                                            ),
                                           ),
                                         ),
                                         const SizedBox(height: 16),
@@ -271,14 +274,16 @@ class Rewards extends StatelessWidget {
                     const SizedBox(height: 8),
 
                     milestones.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            child: Text(
-                              "No milestones achieved yet.",
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                color: AppColors.textSecondary,
-                                fontSize: 14,
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: Text(
+                                "No milestones achieved yet.",
+                                style: TextStyle(
+                                  fontFamily: "Poppins",
+                                  color: AppColors.textPrimary,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
                           )
@@ -320,8 +325,8 @@ class Rewards extends StatelessWidget {
                                             ],
                                           ),
                                           child: const Icon(
-                                            Icons.kitesurfing,
-                                            color: Colors.purple,
+                                            Icons.pets,
+                                            color: AppColors.textSecondary,
                                           ),
                                         ),
                                         const SizedBox(width: 16),
@@ -379,7 +384,6 @@ class Rewards extends StatelessWidget {
                         height: 55,
                         child: ElevatedButton(
                           onPressed: () {
-                            print("Share clicked");
                             final badgeCount = summary?.totalBadges ?? 0;
                             final unlockedCount = summary?.unlocked ?? 0;
                             final milestonesCount = milestones.length;
