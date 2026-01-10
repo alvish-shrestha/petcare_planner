@@ -124,7 +124,7 @@ class Home extends StatelessWidget {
                         offset: const Offset(0, -8),
                         child: GestureDetector(
                           onTap: () {
-                            print("Notification Tapped");
+                            // TODO
                           },
                           child: Container(
                             height: 40,

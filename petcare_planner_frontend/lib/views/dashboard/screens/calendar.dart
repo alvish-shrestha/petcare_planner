@@ -71,7 +71,6 @@ class _CalendarState extends State<Calendar> {
                   child: GestureDetector(
                     onTap: () {
                       // TODO: handle notification tap
-                      print("Notification Tapped");
                     },
                     child: Container(
                       height: 40,
