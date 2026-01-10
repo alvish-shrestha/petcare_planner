@@ -364,7 +364,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: Container(
-                  height: 96, // approx 3 rows height
+                  height: 96,
                   decoration: BoxDecoration(
                     boxShadow: const [
                       BoxShadow(
@@ -437,7 +437,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                         final viewModel = context.read<TaskViewModel>();
 
                         if (taskTitleController.text.trim().isEmpty) {
-                          AppSnackBar.showCentered(
+                          AppSnackBar.show(
                             context,
                             message: "Task title is required",
                             type: SnackBarType.error,
@@ -445,7 +445,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                           return;
                         }
                         if (selectedPetId == null) {
-                          AppSnackBar.showCentered(
+                          AppSnackBar.show(
                             context,
                             message: "Please select a pet",
                             type: SnackBarType.error,
@@ -453,7 +453,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                           return;
                         }
                         if (selectedTaskType == null) {
-                          AppSnackBar.showCentered(
+                          AppSnackBar.show(
                             context,
                             message: "Please select a task type",
                             type: SnackBarType.error,
@@ -461,7 +461,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                           return;
                         }
                         if (selectedDate == null || selectedTime == null) {
-                          AppSnackBar.showCentered(
+                          AppSnackBar.show(
                             context,
                             message: "Please select date and time",
                             type: SnackBarType.error,
@@ -486,22 +486,22 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                         );
 
                         if (viewModel.errorMessage != null) {
-                          AppSnackBar.showCentered(
+                          AppSnackBar.show(
                             context,
                             message: viewModel.errorMessage!,
                             type: SnackBarType.error,
                           );
                         } else if (success) {
-                          AppSnackBar.showCentered(
-                            context,
-                            message: "Task added successfully!",
-                            type: SnackBarType.success,
-                          );
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) => const DashboardView(),
                             ),
+                          );
+                          AppSnackBar.show(
+                            context,
+                            message: "Task added successfully!",
+                            type: SnackBarType.success,
                           );
                         }
                       },

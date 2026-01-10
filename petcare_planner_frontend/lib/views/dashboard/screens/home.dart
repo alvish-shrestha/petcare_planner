@@ -1,9 +1,12 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/utils/pet_api_utils.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
+import 'package:petcare_planner_frontend/views/pet/add_pet.dart';
 import 'package:petcare_planner_frontend/views/task/add_task.dart';
 import 'package:petcare_planner_frontend/widgets/add_task_button.dart';
 import 'package:petcare_planner_frontend/widgets/pet_details_card.dart';
@@ -69,8 +72,8 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final petVM = context.read<PetViewModel>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final petVM = context.read<PetViewModel>();
       if (petVM.pets.isEmpty && !petVM.isLoading) {
         petVM.fetchPets();
       }
@@ -106,6 +109,9 @@ class Home extends StatelessWidget {
                     children: [
                       Consumer<AuthViewModel>(
                         builder: (context, authVM, _) {
+                          print(
+                            "Home widget build: pets count = ${petVM.pets.length}",
+                          );
                           final username = authVM.user?.username ?? 'User';
                           return Text(
                             'Hi, $username! 👋',
@@ -153,7 +159,7 @@ class Home extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                /// --- PET DETAILS CARD ---
+                /// --- PET DETAILS / EMPTY STATE ---
                 Consumer<PetViewModel>(
                   builder: (context, petVM, _) {
                     if (petVM.isLoading) {
@@ -163,8 +169,99 @@ class Home extends StatelessWidget {
                       );
                     }
 
+                    /// --- NO PETS STATE ---
+                    if (petVM.pets.isEmpty) {
+                      return Container(
+                        width: 330,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 20,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x20000000),
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(
+                              Icons.pets,
+                              size: 48,
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              "No pets added yet",
+                              style: TextStyle(
+                                fontFamily: "Poppins-Bold",
+                                fontSize: 16,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              "Add your pet to start managing care tasks",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: "Poppins",
+                                fontSize: 13,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () {
+                                print('Navigating to AddPetScreen');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const AddPetScreen(),
+                                  ),
+                                );
+                              },
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Text(
+                                    "Add Pet",
+                                    style: TextStyle(
+                                      fontFamily: "Poppins-Bold",
+                                      fontSize: 14,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom:
+                                        0, // adjust this to add more space below the text
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      height: 2, // thickness of underline
+                                      color: AppColors.textPrimary.withOpacity(
+                                        0.5,
+                                      ),
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 1,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    /// --- PET DETAILS CARD ---
                     if (petVM.selectedPet == null) {
-                      return const SizedBox();
+                      petVM.selectPet(petVM.pets.first);
                     }
 
                     WidgetsBinding.instance.addPostFrameCallback((_) {

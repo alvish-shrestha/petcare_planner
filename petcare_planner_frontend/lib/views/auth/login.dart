@@ -1,16 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/repository/pet_repository.dart';
-import 'package:petcare_planner_frontend/services/pet_service.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
-import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/views/dashboard/dashboard.dart';
-import 'package:petcare_planner_frontend/views/pet/add_pet.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/auth_text_field.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginForm extends StatelessWidget {
@@ -133,31 +128,12 @@ class LoginForm extends StatelessWidget {
                                       type: SnackBarType.success,
                                     );
 
-                                    final petViewModel = PetViewModel(
-                                      PetRepository(PetService()),
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder: (_) => const DashboardView(),
+                                      ),
+                                      (route) => false,
                                     );
-
-                                    await petViewModel.fetchPets();
-
-                                    if (petViewModel.pets.isEmpty) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              ChangeNotifierProvider.value(
-                                                value: petViewModel,
-                                                child: const AddPetScreen(),
-                                              ),
-                                        ),
-                                      );
-                                    } else {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => const DashboardView(),
-                                        ),
-                                      );
-                                    }
 
                                     if (onLoginSuccess != null) {
                                       onLoginSuccess!();
