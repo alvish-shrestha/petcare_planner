@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
+import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
 import 'package:petcare_planner_frontend/views/help_and_support/help_and_support.dart';
 import 'package:petcare_planner_frontend/views/pet/add_pet.dart';
@@ -175,29 +176,32 @@ class Settings extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              MyPetsSection(
-                pets: [
-                  Pet(
-                    name: "Dolli",
-                    breed: "Golden Retriever",
-                    age: 3,
-                    imageUrl: "https://placedog.net/100/100",
-                  ),
-                  Pet(
-                    name: "Max",
-                    breed: "Bulldog",
-                    age: 2,
-                    imageUrl: "https://placedog.net/101/101",
-                  ),
-                ],
-                onPetTap: (pet) {
-                  print("Tapped pet: ${pet.name}");
-                  // Navigate or do something here
-                },
-                onAddNewPet: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AddPetScreen()),
+              Consumer<PetViewModel>(
+                builder: (context, petVM, _) {
+                  if (petVM.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (petVM.pets.isEmpty) {
+                    return const Center(child: Text("No pets found"));
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.all(0),
+                    child: MyPetsSection(
+                      pets: petVM.pets,
+                      onAddNewPet: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AddPetScreen(),
+                          ),
+                        );
+                      },
+                      onPetTap: (pet) {
+                        // TODO
+                      },
+                    ),
                   );
                 },
               ),

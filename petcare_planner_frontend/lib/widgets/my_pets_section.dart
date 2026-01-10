@@ -1,21 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/models/pet.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
-
-class Pet {
-  final String name;
-  final String breed;
-  final int age;
-  final String imageUrl;
-
-  Pet({
-    required this.name,
-    required this.breed,
-    required this.age,
-    required this.imageUrl,
-  });
-}
+import 'package:petcare_planner_frontend/utils/pet_api_utils.dart';
 
 class MyPetsSection extends StatelessWidget {
   final List<Pet> pets;
@@ -29,28 +17,23 @@ class MyPetsSection extends StatelessWidget {
     this.onPetTap,
   });
 
-  BoxDecoration _cardDecoration() {
-    return BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(24),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.098),
-          blurRadius: 12,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         children: [
-          // List of pet items
           for (final pet in pets) ...[
             GestureDetector(
               onTap: () => onPetTap?.call(pet),
@@ -65,34 +48,42 @@ class MyPetsSection extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 32,
-                      backgroundImage: NetworkImage(pet.imageUrl),
+                      backgroundImage:
+                          pet.petImage != null && pet.petImage!.isNotEmpty
+                          ? NetworkImage(
+                              PetApiUtils.getFullImageUrl(pet.petImage!),
+                            )
+                          : null,
+                      child: pet.petImage == null || pet.petImage!.isEmpty
+                          ? const Icon(Icons.pets)
+                          : null,
                     ),
                     const SizedBox(width: 15),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          pet.name,
+                          pet.petName,
                           style: const TextStyle(
                             fontFamily: "Poppins-Medium",
-                            color: AppColors.textPrimary,
                             fontSize: 15,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         Text(
                           "${pet.breed}\n• ${pet.age} years",
                           style: const TextStyle(
                             fontFamily: "Poppins",
-                            color: AppColors.textPrimary,
                             fontSize: 12,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ],
                     ),
                     const Spacer(),
                     const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 16,
+                      Icons.chevron_right,
+                      size: 24,
                       color: AppColors.textPrimary,
                     ),
                   ],
@@ -101,7 +92,7 @@ class MyPetsSection extends StatelessWidget {
             ),
           ],
 
-          // Add New Pet Button
+          /// --- Add New Pet Button ---
           SizedBox(
             width: double.infinity,
             height: 50,
