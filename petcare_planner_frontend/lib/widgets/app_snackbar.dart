@@ -204,7 +204,7 @@ class AppSnackBar {
   //     builder: (context) {
   //       return Positioned.fill(
   //         child: IgnorePointer(
-  //           ignoring: true, 
+  //           ignoring: true,
   //           child: Center(
   //             child: ClipRRect(
   //               borderRadius: BorderRadius.circular(30),
