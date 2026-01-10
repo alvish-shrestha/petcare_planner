@@ -57,5 +57,12 @@
 	<!-- Camera access (if you allow taking photos) -->
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to take pet photos.</string>
+
+	<!-- URL schemes for email & phone -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>mailto</string>
+	</array>
 </dict>
 </plist>
