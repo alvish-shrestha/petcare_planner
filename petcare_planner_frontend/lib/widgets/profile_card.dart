@@ -2,18 +2,22 @@
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/utils/user_api_utils.dart';
 
-// The new ProfileCard component
 class ProfileCard extends StatelessWidget {
   final String name;
   final String email;
+  final String? profileImageUrl;
   final VoidCallback? onEdit;
+  final VoidCallback? onAvatarTap;
 
   const ProfileCard({
     super.key,
     required this.name,
     required this.email,
+    this.profileImageUrl,
     this.onEdit,
+    this.onAvatarTap,
   });
 
   BoxDecoration _cardDecoration() {
@@ -37,21 +41,36 @@ class ProfileCard extends StatelessWidget {
       decoration: _cardDecoration(),
       child: Row(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.25),
-                  offset: const Offset(0, 2),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-            child: const CircleAvatar(
-              radius: 40,
-              backgroundColor: Color(0xFFFDF6E3),
-              child: Icon(Icons.image, size: 30, color: AppColors.primary),
+          GestureDetector(
+            onTap: onAvatarTap,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.25),
+                    offset: const Offset(0, 2),
+                    blurRadius: 12,
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                radius: 40,
+                backgroundColor: AppColors.background,
+                backgroundImage: profileImageUrl != null
+                    ? NetworkImage(
+                        UserApiUtils.getFullImageUrl(profileImageUrl!),
+                      )
+                    : null,
+
+                child: profileImageUrl == null
+                    ? const Icon(
+                        Icons.image,
+                        size: 30,
+                        color: AppColors.primary,
+                      )
+                    : null,
+              ),
             ),
           ),
 
@@ -68,7 +87,7 @@ class ProfileCard extends StatelessWidget {
                   color: AppColors.textPrimary,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 email,
                 style: const TextStyle(

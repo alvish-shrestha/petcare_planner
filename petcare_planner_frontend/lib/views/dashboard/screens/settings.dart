@@ -1,12 +1,15 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
+import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
 import 'package:petcare_planner_frontend/views/help_and_support/help_and_support.dart';
 import 'package:petcare_planner_frontend/widgets/my_pets_section.dart';
 import 'package:petcare_planner_frontend/widgets/notification_card.dart';
 import 'package:petcare_planner_frontend/widgets/profile_card.dart';
 import 'package:petcare_planner_frontend/widgets/support_card.dart';
+import 'package:provider/provider.dart';
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
@@ -49,14 +52,51 @@ class Settings extends StatelessWidget {
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.logout, color: AppColors.primary),
-                      onPressed: () {},
+                      onPressed: () async {
+                        final authVM = Provider.of<AuthViewModel>(
+                          context,
+                          listen: false,
+                        );
+                        await authVM.logout();
+
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const AuthScreen()),
+                          (route) => false,
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 18),
 
-              ProfileCard(name: "Alvish", email: "alvish@gmail.com"),
+              Consumer<AuthViewModel>(
+                builder: (context, authVM, _) {
+                  final user = authVM.user;
+                  return ProfileCard(
+                    name: user?.username ?? 'User',
+                    email: user?.email ?? '',
+                    profileImageUrl: user?.profileImageUrl,
+                    onEdit: () {
+                      // TODO
+                    },
+                    onAvatarTap: () async {
+                      try {
+                        await authVM.pickAndUploadProfileImage();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Profile image updated!')),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to update profile image: $e'),
+                          ),
+                        );
+                      }
+                    },
+                  );
+                },
+              ),
 
               const SizedBox(height: 18),
 

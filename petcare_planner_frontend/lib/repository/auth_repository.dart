@@ -10,7 +10,7 @@ class AuthRepository {
 
   static const String _userKey = 'logged_in_user';
 
-  /// LOGIN
+  /// --- LOGIN ---
   Future<User> login(String email, String password) async {
     final response = await _authService.login(email, password);
 
@@ -21,7 +21,7 @@ class AuthRepository {
     return user;
   }
 
-  /// REGISTER
+  /// --- REGISTER ---
   Future<User> register({
     required String name,
     required String email,
@@ -41,13 +41,13 @@ class AuthRepository {
     return user;
   }
 
-  /// SAVE USER LOCALLY
+  /// --- SAVE USER LOCALLY ---
   Future<void> _saveUser(User user) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(_userKey, jsonEncode(user.toJson()));
   }
 
-  /// GET SAVED USER (AUTO LOGIN / OFFLINE)
+  /// --- GET SAVED USER (AUTO LOGIN / OFFLINE) ---
   Future<User?> getSavedUser() async {
     final prefs = await SharedPreferences.getInstance();
     final userString = prefs.getString(_userKey);
@@ -57,13 +57,13 @@ class AuthRepository {
     return User.fromJson(jsonDecode(userString));
   }
 
-  /// LOGOUT
+  /// --- LOGOUT ---
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey);
   }
 
-  /// CHECK LOGIN STATUS
+  /// --- CHECK LOGIN STATUS ---
   Future<bool> isLoggedIn() async {
     final user = await getSavedUser();
     return user != null;

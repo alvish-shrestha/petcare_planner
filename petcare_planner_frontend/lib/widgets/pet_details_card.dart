@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/models/pet.dart';
-import 'package:petcare_planner_frontend/utils/api_utils.dart';
+import 'package:petcare_planner_frontend/utils/pet_api_utils.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 
 class PetDetailsCard extends StatelessWidget {
@@ -9,8 +9,6 @@ class PetDetailsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('PET IMAGE PATH: ${pet.petImage}');
-
     return Container(
       width: 330,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -31,7 +29,7 @@ class PetDetailsCard extends StatelessWidget {
           ClipOval(
             child: pet.petImage != null && pet.petImage!.isNotEmpty
                 ? Image.network(
-                    ApiUtils.getFullImageUrl(pet.petImage!),
+                    PetApiUtils.getFullImageUrl(pet.petImage!),
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
