@@ -1,116 +1,175 @@
-// ignore_for_file: unused_element_parameter
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/utils/app_colors.dart';
+
+enum SnackBarType { success, error, info }
 
 class AppSnackBar {
   static void show(
     BuildContext context, {
     required String message,
     SnackBarType type = SnackBarType.info,
-    Duration duration = const Duration(seconds: 3),
   }) {
-    final color = _getColor(type);
-    final icon = _getIcon(type);
+    Color iconBackgroundColor;
+    Icon icon;
 
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: duration,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: color,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        content: _AnimatedSnackBarContent(icon: icon, message: message),
-      ),
-    );
-  }
-
-  static Color _getColor(SnackBarType type) {
     switch (type) {
       case SnackBarType.success:
-        return Colors.green;
+        iconBackgroundColor = AppColors.primary;
+        icon = const Icon(Icons.check, color: AppColors.white, size: 14);
+        break;
       case SnackBarType.error:
-        return Colors.red;
-      case SnackBarType.warning:
-        return Colors.orange;
+        iconBackgroundColor = Colors.red;
+        icon = const Icon(Icons.error, color: AppColors.white, size: 14);
+        break;
       case SnackBarType.info:
-        return Colors.blueGrey;
+        iconBackgroundColor = Colors.blue;
+        icon = const Icon(Icons.info, color: AppColors.white, size: 14);
+        break;
     }
-  }
 
-  static IconData _getIcon(SnackBarType type) {
-    switch (type) {
-      case SnackBarType.success:
-        return Icons.check_circle;
-      case SnackBarType.error:
-        return Icons.error;
-      case SnackBarType.warning:
-        return Icons.warning;
-      case SnackBarType.info:
-        return Icons.info;
-    }
-  }
-}
-
-enum SnackBarType { success, error, warning, info }
-
-class _AnimatedSnackBarContent extends StatefulWidget {
-  final IconData icon;
-  final String message;
-
-  const _AnimatedSnackBarContent({
-    super.key,
-    required this.icon,
-    required this.message,
-  });
-
-  @override
-  State<_AnimatedSnackBarContent> createState() =>
-      _AnimatedSnackBarContentState();
-}
-
-class _AnimatedSnackBarContentState extends State<_AnimatedSnackBarContent>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-
-    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: Row(
-        children: [
-          Icon(widget.icon, color: Colors.white),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              widget.message,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+    final snackBar = SnackBar(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      content: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: iconBackgroundColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: icon,
+                ),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      fontFamily: "Poppins",
+                      color: AppColors.textPrimary,
+                      fontSize: 14,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 10,
+                          color: Colors.black26,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  static void showCentered(
+    BuildContext context, {
+    required String message,
+    SnackBarType type = SnackBarType.info,
+    Duration duration = const Duration(seconds: 2),
+  }) {
+    Color iconBackgroundColor;
+    Icon icon;
+
+    switch (type) {
+      case SnackBarType.success:
+        iconBackgroundColor = AppColors.primary;
+        icon = const Icon(Icons.check, color: Colors.white, size: 14);
+        break;
+      case SnackBarType.error:
+        iconBackgroundColor = Colors.red;
+        icon = const Icon(Icons.error, color: Colors.white, size: 14);
+        break;
+      case SnackBarType.info:
+        iconBackgroundColor = Colors.blue;
+        icon = const Icon(Icons.info, color: Colors.white, size: 14);
+        break;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.transparent,
+      builder: (_) {
+        Future.delayed(duration, () {
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+        });
+
+        return Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.25),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: iconBackgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: icon,
+                    ),
+                    const SizedBox(width: 16),
+                    Flexible(
+                      child: Text(
+                        message,
+                        style: const TextStyle(
+                          fontFamily: "Poppins",
+                          color: AppColors.textPrimary,
+                          fontSize: 14,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 10,
+                              color: Colors.black26,
+                              offset: Offset(0, 0.098),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

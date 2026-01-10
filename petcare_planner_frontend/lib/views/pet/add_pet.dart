@@ -325,7 +325,7 @@ class _AddPetFormState extends State<_AddPetForm> {
 
                         if (viewModel.petType == null ||
                             viewModel.gender == null) {
-                          AppSnackBar.show(
+                          AppSnackBar.showCentered(
                             context,
                             message: "Please select pet type and gender",
                             type: SnackBarType.error,
@@ -336,7 +336,7 @@ class _AddPetFormState extends State<_AddPetForm> {
                         if (petNameController.text.isEmpty ||
                             breedController.text.isEmpty ||
                             ageController.text.isEmpty) {
-                          AppSnackBar.show(
+                          AppSnackBar.showCentered(
                             context,
                             message: "All fields are required",
                             type: SnackBarType.error,
@@ -355,7 +355,7 @@ class _AddPetFormState extends State<_AddPetForm> {
                         if (success) {
                           await viewModel.fetchPets();
 
-                          AppSnackBar.show(
+                          AppSnackBar.showCentered(
                             context,
                             message: "Pet Added Successfully!",
                             type: SnackBarType.success,
@@ -368,7 +368,7 @@ class _AddPetFormState extends State<_AddPetForm> {
                             ),
                           );
                         } else {
-                          AppSnackBar.show(
+                          AppSnackBar.showCentered(
                             context,
                             message:
                                 viewModel.errorMessage ?? "Failed to add pet",

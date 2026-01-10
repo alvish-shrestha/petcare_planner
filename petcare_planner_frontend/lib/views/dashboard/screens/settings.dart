@@ -5,6 +5,7 @@ import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
 import 'package:petcare_planner_frontend/views/help_and_support/help_and_support.dart';
+import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/my_pets_section.dart';
 import 'package:petcare_planner_frontend/widgets/notification_card.dart';
 import 'package:petcare_planner_frontend/widgets/profile_card.dart';
@@ -58,6 +59,12 @@ class Settings extends StatelessWidget {
                           listen: false,
                         );
                         await authVM.logout();
+
+                        AppSnackBar.showCentered(
+                          context,
+                          message: "Logged out successfully",
+                          type: SnackBarType.success,
+                        );
 
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(builder: (_) => const AuthScreen()),
