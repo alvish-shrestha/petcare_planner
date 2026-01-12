@@ -8,6 +8,7 @@ import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/views/edit_profile/edit_profile_view.dart';
 import 'package:petcare_planner_frontend/views/help_and_support/help_and_support.dart';
 import 'package:petcare_planner_frontend/views/pet/add_pet.dart';
+import 'package:petcare_planner_frontend/views/pet/edit_pet.dart';
 import 'package:petcare_planner_frontend/widgets/my_pets_section.dart';
 import 'package:petcare_planner_frontend/widgets/notification_card.dart';
 import 'package:petcare_planner_frontend/widgets/profile_card.dart';
@@ -213,7 +214,12 @@ class Settings extends StatelessWidget {
                       );
                     },
                     onPetTap: (pet) {
-                      // TODO
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EditPetScreen(pet: pet),
+                        ),
+                      );
                     },
                   );
                 },

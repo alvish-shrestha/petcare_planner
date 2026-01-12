@@ -88,24 +88,6 @@ class PetViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Future<void> fetchPets() async {
-  //   _setLoading(true);
-  //   errorMessage = null;
-
-  //   try {
-  //     final response = await _repository.getAllPets();
-  //     if (response['success'] == true) {
-  //       pets = (response['pets'] as List).map((e) => Pet.fromJson(e)).toList();
-  //     } else {
-  //       errorMessage = response['message'] ?? 'Failed to load pets';
-  //     }
-  //   } catch (e) {
-  //     errorMessage = e.toString();
-  //   } finally {
-  //     _setLoading(false);
-  //   }
-  // }
-
   Future<void> fetchPets() async {
     _setLoading(true);
     errorMessage = null;
@@ -149,6 +131,64 @@ class PetViewModel extends ChangeNotifier {
     } else {
       selectedPet = pets.first;
     }
+    notifyListeners();
+  }
+
+  /// --- UPDATE PET LOGIC ---
+  Future<bool> updatePet({
+    required String petId,
+    required String petName,
+    required String breed,
+    required int age,
+  }) async {
+    _setLoading(true);
+    errorMessage = null;
+
+    try {
+      await _repository.updatePet(
+        id: petId,
+        petType: petType,
+        petName: petName,
+        breed: breed,
+        age: age,
+        gender: gender,
+        petImage: petImage,
+      );
+
+      await fetchPets();
+      _reset();
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// --- DELETE PET LOGIC ---
+  Future<bool> deletePet(String petId) async {
+    _setLoading(true);
+    errorMessage = null;
+
+    try {
+      await _repository.deletePet(petId);
+
+      pets.removeWhere((p) => p.id == petId);
+      selectedPet = null;
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  void clearImage() {
+    petImage = null;
     notifyListeners();
   }
 }
