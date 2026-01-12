@@ -3,8 +3,7 @@ const Pet = require("../models/Pet");
 const Task = require("../models/Task");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const multer = require("multer");
-const path = require("path");
+const nodemailer = require("nodemailer");
 
 exports.registerUser = async (req, res) => {
   const { username, email, password, confirmPassword } = req.body;
@@ -281,6 +280,76 @@ exports.deleteUser = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Server error",
+    });
+  }
+};
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+exports.sendResetLink = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    const token = jwt.sign({ id: user._id }, process.env.SECRET, {
+      expiresIn: "15m",
+    });
+    const resetUrl = process.env.CLIENT_URL + "/password/" + token;
+    const mailOptions = {
+      from: `"PetCare Planner" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Reset your password",
+      html: `<p>Reset your password.. ${resetUrl}</p>`,
+    };
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({
+          success: false,
+          message: "Failed",
+        });
+      }
+      if (info) console.log(info);
+      return res.status(200).json({
+        success: true,
+        message: "Reset link sent to your email",
+      });
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET);
+    const hased = await bcrypt.hash(password, 10);
+    await User.findByIdAndUpdate(decoded.id, { password: hased });
+    return res.status(200).json({
+      success: true,
+      message: "Password updated",
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error / Token invalid",
     });
   }
 };
