@@ -5,14 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:petcare_planner_frontend/models/user.dart';
-import 'package:petcare_planner_frontend/repository/auth_repository.dart';
+// import 'package:petcare_planner_frontend/repository/auth_repository.dart';
 import 'package:petcare_planner_frontend/services/auth_service.dart';
 import 'package:petcare_planner_frontend/utils/api_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final AuthService _authService = AuthService();
-  late final AuthRepository _authRepository;
+  // late final AuthRepository _authRepository;
 
   User? _user;
   String? _token;
@@ -27,7 +27,7 @@ class AuthViewModel extends ChangeNotifier {
   String? get token => _token;
 
   AuthViewModel() {
-    _authRepository = AuthRepository(_authService);
+    // _authRepository = AuthRepository(_authService);
     _loadUserFromPrefsOnInit();
   }
 
@@ -110,7 +110,8 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<void> logout() async {
     try {
-      await _authRepository.logout();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('logged_in_user');
 
       _user = null;
       _token = null;
@@ -223,6 +224,37 @@ class AuthViewModel extends ChangeNotifier {
       );
 
       // await logout();
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    if (_token == null) {
+      _errorMessage = 'User not authenticated';
+      notifyListeners();
+      return;
+    }
+
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await http.delete(
+        Uri.parse('${ApiConfig.baseUrl}/api/auth/deleteUser'),
+        headers: {'Authorization': 'Bearer $_token'},
+      );
+
+      if (response.statusCode == 200) {
+        await logout();
+      } else {
+        final jsonResp = jsonDecode(response.body);
+        throw Exception(jsonResp['message'] ?? 'Failed to delete account');
+      }
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
     } finally {

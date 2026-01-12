@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const Pet = require("../models/Pet");
+const Task = require("../models/Task");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
@@ -125,6 +127,7 @@ exports.loginUser = async (req, res) => {
         _id: getUser._id,
         username: getUser.username,
         email: getUser.email,
+        profileImageUrl: getUser.profileImageUrl,
       },
       token: token,
     });
@@ -263,11 +266,15 @@ exports.deleteUser = async (req, res) => {
       });
     }
 
+    await Pet.deleteMany({ userId: userId });
+
+    await Task.deleteMany({ userId: userId });
+
     await User.findByIdAndDelete(userId);
 
     return res.status(200).json({
       success: true,
-      message: "User deleted successfully",
+      message: "User and related pets and tasks deleted successfully",
     });
   } catch (err) {
     console.error(err);
