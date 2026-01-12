@@ -56,7 +56,7 @@ class PetCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(50),
                           child: pet.petImage != null
                               ? Image.network(
-                                  "http://192.168.1.65:3000/${pet.petImage}",
+                                  "http://192.168.1.71:3000/${pet.petImage}",
                                   width: 56,
                                   height: 56,
                                   fit: BoxFit.cover,

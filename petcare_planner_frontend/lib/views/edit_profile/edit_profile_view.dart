@@ -37,6 +37,63 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          "Delete Account",
+          style: TextStyle(fontFamily: "Poppins-Bold", fontSize: 20),
+        ),
+        content: const Text(
+          "Are you sure you want to delete your account? This action cannot be undone.",
+          style: TextStyle(fontFamily: "Poppins", fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(
+                fontFamily: "Poppins-Medium",
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              // final authVM = context.read<AuthViewModel>();
+              try {
+                // await authVM.deleteAccount();
+
+                AppSnackBar.show(
+                  context,
+                  message: "Account deleted successfully",
+                  type: SnackBarType.success,
+                );
+                // Navigate to Login or Welcome screen
+                // Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+              } catch (e) {
+                AppSnackBar.show(
+                  context,
+                  message: "Failed to delete account: $e",
+                  type: SnackBarType.error,
+                );
+              }
+            },
+            child: const Text(
+              "Delete",
+              style: TextStyle(fontFamily: "Poppins-Medium", color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -186,6 +243,60 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
+
+                    // ... inside the Column children ...
+                    const SizedBox(height: 25),
+
+                    // --- DELETE ACCOUNT SECTION ---
+                    Center(
+                      child: Column(
+                        children: [
+                          TextButton(
+                            onPressed: () =>
+                                _showDeleteConfirmationDialog(context),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.red.withOpacity(0.1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                bottom: 3,
+                              ), // Space between text and line
+                              decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.red,
+                                    width: 1.0,
+                                  ),
+                                ),
+                              ),
+                              child: const Text(
+                                "Delete Account",
+                                style: TextStyle(
+                                  fontFamily: "Poppins-Medium",
+                                  fontSize: 15,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          // --- THE NON-REVERSIBLE LABEL ---
+                          const SizedBox(height: 4),
+                          Text(
+                            "‼️ This action cannot be undone",
+                            style: TextStyle(
+                              fontFamily: "Poppins",
+                              fontSize: 12,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                     const SizedBox(height: 20),
                   ],
                 ),
