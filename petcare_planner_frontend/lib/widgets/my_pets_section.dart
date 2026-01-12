@@ -34,62 +34,74 @@ class MyPetsSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          for (final pet in pets) ...[
-            GestureDetector(
-              onTap: () => onPetTap?.call(pet),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 32,
-                      backgroundImage:
-                          pet.petImage != null && pet.petImage!.isNotEmpty
-                          ? NetworkImage(
-                              PetApiUtils.getFullImageUrl(pet.petImage!),
-                            )
-                          : null,
-                      child: pet.petImage == null || pet.petImage!.isEmpty
-                          ? const Icon(Icons.pets)
-                          : null,
-                    ),
-                    const SizedBox(width: 15),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          pet.petName,
-                          style: const TextStyle(
-                            fontFamily: "Poppins-Medium",
-                            fontSize: 15,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        Text(
-                          "${pet.breed}\n• ${pet.age} years",
-                          style: const TextStyle(
-                            fontFamily: "Poppins",
-                            fontSize: 12,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    const Icon(
-                      Icons.chevron_right,
-                      size: 24,
-                      color: AppColors.textPrimary,
-                    ),
-                  ],
-                ),
+          if (pets.isEmpty) ...[
+            const Text(
+              "No pets found",
+              style: TextStyle(
+                fontFamily: "Poppins-Medium",
+                fontSize: 16,
+                color: AppColors.textPrimary,
               ),
             ),
+            const SizedBox(height: 16),
+          ] else ...[
+            for (final pet in pets) ...[
+              GestureDetector(
+                onTap: () => onPetTap?.call(pet),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 32,
+                        backgroundImage:
+                            pet.petImage != null && pet.petImage!.isNotEmpty
+                            ? NetworkImage(
+                                PetApiUtils.getFullImageUrl(pet.petImage!),
+                              )
+                            : null,
+                        child: pet.petImage == null || pet.petImage!.isEmpty
+                            ? const Icon(Icons.pets)
+                            : null,
+                      ),
+                      const SizedBox(width: 15),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            pet.petName,
+                            style: const TextStyle(
+                              fontFamily: "Poppins-Medium",
+                              fontSize: 15,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            "${pet.breed}\n• ${pet.age} years",
+                            style: const TextStyle(
+                              fontFamily: "Poppins",
+                              fontSize: 12,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      const Icon(
+                        Icons.chevron_right,
+                        size: 24,
+                        color: AppColors.textPrimary,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
 
           /// --- Add New Pet Button ---
