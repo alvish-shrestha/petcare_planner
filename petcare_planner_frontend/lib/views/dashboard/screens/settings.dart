@@ -5,6 +5,7 @@ import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
+import 'package:petcare_planner_frontend/views/edit_profile/edit_profile_view.dart';
 import 'package:petcare_planner_frontend/views/help_and_support/help_and_support.dart';
 import 'package:petcare_planner_frontend/views/pet/add_pet.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
@@ -87,23 +88,9 @@ class Settings extends StatelessWidget {
                     email: user?.email ?? '',
                     profileImageUrl: user?.profileImageUrl,
                     onEdit: () {
-                      // TODO
-                    },
-                    onAvatarTap: () async {
-                      try {
-                        await authVM.pickAndUploadProfileImage();
-                        AppSnackBar.show(
-                          context,
-                          message: "Profile Image Uploaded",
-                          type: SnackBarType.success,
-                        );
-                      } catch (e) {
-                        AppSnackBar.show(
-                          context,
-                          message: "Failed to update profile image: $e",
-                          type: SnackBarType.error,
-                        );
-                      }
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => EditProfileScreen()),
+                      );
                     },
                   );
                 },

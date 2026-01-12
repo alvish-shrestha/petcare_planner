@@ -74,8 +74,6 @@ class _AddPetFormState extends State<_AddPetForm> {
                 children: [
                   // --- Back Button ---
                   Container(
-                    width: 40,
-                    height: 40,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
@@ -89,7 +87,11 @@ class _AddPetFormState extends State<_AddPetForm> {
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      icon: const Icon(Icons.chevron_left, color: Colors.black),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        size: 18,
+                        color: AppColors.textPrimary,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
