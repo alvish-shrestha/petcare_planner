@@ -7,6 +7,8 @@ const {
   updateProfile,
   changePassword,
   deleteUser,
+  sendResetLink,
+  resetPassword,
 } = require("../controllers/userController");
 
 const {
@@ -16,20 +18,26 @@ const {
 
 const authMiddleware = require("../middleware/authMiddleware");
 
-// --- Register User ---
+/// --- Register User ---
 router.post("/register", registerUser);
 
-// --- Login User ---
+/// --- Login User ---
 router.post("/login", loginUser);
 
-// --- Update User Profile ---
+/// --- Update User Profile ---
 router.put("/updateProfile", authMiddleware, updateProfile);
 
-// --- Change Password ---
+/// --- Change Password ---
 router.put("/change-password", authMiddleware, changePassword);
 
-// --- Delete User Profile ---
+/// --- Delete User Profile ---
 router.delete("/deleteUser", authMiddleware, deleteUser);
+
+/// --- Request link sent ---
+router.post("/request-reset", sendResetLink);
+
+/// --- Reset Password ---
+router.post("/reset-password/:token", resetPassword);
 
 // --- Upload Profile Image ---
 router.post(
