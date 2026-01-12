@@ -1,14 +1,13 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/modal/logout_modal.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
-import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
 import 'package:petcare_planner_frontend/views/edit_profile/edit_profile_view.dart';
 import 'package:petcare_planner_frontend/views/help_and_support/help_and_support.dart';
 import 'package:petcare_planner_frontend/views/pet/add_pet.dart';
-import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/my_pets_section.dart';
 import 'package:petcare_planner_frontend/widgets/notification_card.dart';
 import 'package:petcare_planner_frontend/widgets/profile_card.dart';
@@ -56,22 +55,11 @@ class Settings extends StatelessWidget {
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.logout, color: AppColors.primary),
-                      onPressed: () async {
-                        final authVM = Provider.of<AuthViewModel>(
-                          context,
-                          listen: false,
-                        );
-                        await authVM.logout();
-
-                        AppSnackBar.show(
-                          context,
-                          message: "Logged out successfully",
-                          type: SnackBarType.success,
-                        );
-
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (_) => const AuthScreen()),
-                          (route) => false,
+                      onPressed: () {
+                        // Call the separated LogoutModal
+                        showDialog(
+                          context: context,
+                          builder: (context) => const LogoutModal(),
                         );
                       },
                     ),
