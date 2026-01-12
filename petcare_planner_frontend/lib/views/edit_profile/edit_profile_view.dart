@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/modal/change_password_modal.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
+import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/custom_text_field.dart';
@@ -66,17 +67,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              // final authVM = context.read<AuthViewModel>();
               try {
-                // await authVM.deleteAccount();
+                final authVM = context.read<AuthViewModel>();
+                await authVM.deleteAccount();
 
                 AppSnackBar.show(
                   context,
                   message: "Account deleted successfully",
                   type: SnackBarType.success,
                 );
-                // Navigate to Login or Welcome screen
-                // Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+
+                // Navigate to Login or Welcome screen after deletion
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AuthScreen()),
+                  (route) => false,
+                );
               } catch (e) {
                 AppSnackBar.show(
                   context,
