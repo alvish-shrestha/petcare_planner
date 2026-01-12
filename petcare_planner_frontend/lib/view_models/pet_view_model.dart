@@ -116,8 +116,6 @@ class PetViewModel extends ChangeNotifier {
       if (response['success'] == true) {
         pets = (response['pets'] as List).map((e) => Pet.fromJson(e)).toList();
 
-        print("Fetched pets: ${pets.length}");
-
         await _restoreSelectedPet();
       } else {
         errorMessage = response['message'] ?? 'Failed to load pets';

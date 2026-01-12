@@ -1,57 +1,83 @@
-// ignore_for_file: unused_element_parameter, unnecessary_underscores, use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
+import 'package:petcare_planner_frontend/widgets/frequency_selector.dart';
+import 'package:provider/provider.dart';
+import 'package:petcare_planner_frontend/models/task.dart'; // Import your Task model
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
-import 'package:petcare_planner_frontend/views/dashboard/dashboard.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
-import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/custom_date_picker.dart';
 import 'package:petcare_planner_frontend/widgets/custom_text_field.dart';
 import 'package:petcare_planner_frontend/widgets/custom_time_picker.dart';
-import 'package:petcare_planner_frontend/widgets/frequency_selector.dart';
 import 'package:petcare_planner_frontend/widgets/pet_card.dart';
 import 'package:petcare_planner_frontend/widgets/reminder_toggle.dart';
 import 'package:petcare_planner_frontend/widgets/task_type_card.dart';
-import 'package:provider/provider.dart';
 
-class AddTaskScreen extends StatelessWidget {
-  const AddTaskScreen({super.key});
+class EditTaskScreen extends StatelessWidget {
+  final Task task;
+
+  const EditTaskScreen({super.key, required this.task});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: const Padding(padding: EdgeInsets.all(16.0), child: _AddTaskForm()),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _EditTaskForm(task: task),
+      ),
     );
   }
 }
 
-class _AddTaskForm extends StatefulWidget {
-  const _AddTaskForm({super.key});
+class _EditTaskForm extends StatefulWidget {
+  final Task task;
+  const _EditTaskForm({required this.task});
 
   @override
-  State<_AddTaskForm> createState() => _AddTaskFormState();
+  State<_EditTaskForm> createState() => _EditTaskFormState();
 }
 
-class _AddTaskFormState extends State<_AddTaskForm> {
+class _EditTaskFormState extends State<_EditTaskForm> {
   late final TextEditingController taskTitleController;
+  late final TextEditingController notesController;
+
   String? selectedPetId;
   String? selectedTaskType;
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   String repeat = 'None';
-  late final TextEditingController notesController;
-  bool reminder = true;
+  bool reminder = false;
 
   @override
   void initState() {
     super.initState();
-    taskTitleController = TextEditingController();
-    notesController = TextEditingController();
-    selectedDate = DateTime.now();
-    selectedTime = TimeOfDay.now();
+
+    taskTitleController = TextEditingController(text: widget.task.taskTitle);
+    notesController = TextEditingController(text: widget.task.notes ?? "");
+
+    selectedPetId = widget.task.pet.id;
+    selectedTaskType = widget.task.taskType;
+    selectedDate = widget.task.date;
+    repeat = widget.task.repeat;
+    reminder = widget.task.reminder;
+
+    try {
+      if (widget.task.time.contains(":")) {
+        final parts = widget.task.time.split(':');
+        selectedTime = TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
+      } else {
+        selectedTime = TimeOfDay.now();
+      }
+    } catch (e) {
+      selectedTime = TimeOfDay.now();
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PetViewModel>().fetchPets();
@@ -73,6 +99,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
       {'label': 'Grooming', 'image': "assets/images/grooming.png"},
       {'label': 'Medical', 'image': "assets/images/medical.png"},
     ];
+
     final viewModel = context.watch<TaskViewModel>();
     final petViewModel = context.watch<PetViewModel>();
 
@@ -82,18 +109,18 @@ class _AddTaskFormState extends State<_AddTaskForm> {
           children: [
             const SizedBox(height: 60),
 
-            /// --- TITLE ---
+            /// --- HEADER ---
             SizedBox(
               width: 330,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // --- Back Button on left ---
+                  // Back Button
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           color: Color(0x19000000),
                           blurRadius: 8,
@@ -107,13 +134,12 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                         size: 18,
                         color: AppColors.textPrimary,
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                      onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  Text(
-                    "New Task",
+                  // Title
+                  const Text(
+                    "Edit Task",
                     style: TextStyle(
                       fontFamily: "Poppins-Bold",
                       fontSize: 20,
@@ -128,26 +154,8 @@ class _AddTaskFormState extends State<_AddTaskForm> {
             const SizedBox(height: 12),
 
             /// --- Task Title ---
-            SizedBox(
-              width: 330,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Task Title",
-                    style: TextStyle(
-                      fontFamily: "Poppins-Medium",
-                      fontSize: 14,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
+            _buildSectionLabel("Task Title"),
             const SizedBox(height: 2),
-
             SizedBox(
               width: 330,
               height: 60,
@@ -160,60 +168,22 @@ class _AddTaskFormState extends State<_AddTaskForm> {
             const SizedBox(height: 14),
 
             /// --- Select Pet ---
-            SizedBox(
-              width: 330,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Select Pet",
-                    style: TextStyle(
-                      fontFamily: "Poppins-Medium",
-                      fontSize: 14,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
+            _buildSectionLabel("Select Pet"),
             const SizedBox(height: 2),
-
             PetCard(
               pets: petViewModel.pets,
               selectedPetId: selectedPetId,
               isLoading: petViewModel.isLoading,
               onPetSelected: (id) {
-                setState(() {
-                  selectedPetId = id;
-                });
+                setState(() => selectedPetId = id);
               },
             ),
 
             const SizedBox(height: 14),
 
             /// --- Task Type ---
-            SizedBox(
-              width: 330,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Task Type",
-                    style: TextStyle(
-                      fontFamily: "Poppins-Medium",
-                      fontSize: 14,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
+            _buildSectionLabel("Task Type"),
             const SizedBox(height: 2),
-
             SizedBox(
               width: 330,
               height: 110,
@@ -226,9 +196,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                       imagePath: taskType['image']!,
                       selected: selectedTaskType == taskType['label'],
                       onTap: () {
-                        setState(() {
-                          selectedTaskType = taskType['label'];
-                        });
+                        setState(() => selectedTaskType = taskType['label']);
                       },
                     ),
                 ],
@@ -237,7 +205,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
 
             const SizedBox(height: 14),
 
-            /// --- Date & Time Picker ---
+            /// --- Date & Time ---
             SizedBox(
               width: 330,
               child: Row(
@@ -246,16 +214,9 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Text(
-                            "Date",
-                            style: const TextStyle(
-                              fontFamily: "Poppins-Medium",
-                              fontSize: 14,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 8),
+                          child: Text("Date", style: _labelStyle),
                         ),
                         const SizedBox(height: 2),
                         SizedBox(
@@ -264,33 +225,21 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                             initialDate: selectedDate,
                             imageAssetPath: "assets/images/calendar.png",
                             hint: "Select date",
-                            onDateChanged: (newDate) {
-                              setState(() {
-                                selectedDate = newDate;
-                              });
-                            },
+                            onDateChanged: (val) =>
+                                setState(() => selectedDate = val),
                           ),
                         ),
                       ],
                     ),
                   ),
-
                   const SizedBox(width: 12),
-
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Text(
-                            "Time",
-                            style: const TextStyle(
-                              fontFamily: "Poppins-Medium",
-                              fontSize: 14,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 8),
+                          child: Text("Time", style: _labelStyle),
                         ),
                         const SizedBox(height: 2),
                         SizedBox(
@@ -299,11 +248,8 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                             initialTime: selectedTime,
                             imageAssetPath: "assets/images/clock.png",
                             hint: "Select time",
-                            onTimeChanged: (newTime) {
-                              setState(() {
-                                selectedTime = newTime;
-                              });
-                            },
+                            onTimeChanged: (val) =>
+                                setState(() => selectedTime = val),
                           ),
                         ),
                       ],
@@ -341,26 +287,8 @@ class _AddTaskFormState extends State<_AddTaskForm> {
             const SizedBox(height: 14),
 
             /// --- Notes ---
-            SizedBox(
-              width: 330,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Notes (Optional)",
-                    style: TextStyle(
-                      fontFamily: "Poppins-Medium",
-                      fontSize: 14,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
+            _buildSectionLabel("Notes (Optional)"),
             const SizedBox(height: 2),
-
             SizedBox(
               width: 330,
               child: Padding(
@@ -390,11 +318,11 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                     ),
                     textAlignVertical: TextAlignVertical.top,
                     decoration: const InputDecoration(
-                      hintText: "Write notes here...",
+                      hintText: "Add any additional details...",
                       hintStyle: TextStyle(
                         color: Color(0x59716F6F),
                         fontFamily: "Poppins",
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
@@ -411,17 +339,18 @@ class _AddTaskFormState extends State<_AddTaskForm> {
 
             const SizedBox(height: 16),
 
+            /// --- Reminder Toggle ---
             SizedBox(
               width: 330,
               child: ReminderToggle(
-                initialValue: true,
+                initialValue: reminder,
                 onChanged: (val) => setState(() => reminder = val),
               ),
             ),
 
             const SizedBox(height: 24),
 
-            /// --- SUBMIT BUTTON ---
+            /// --- SAVE BUTTON ---
             Container(
               decoration: BoxDecoration(
                 boxShadow: [
@@ -432,7 +361,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
               child: viewModel.isLoading
                   ? const CircularProgressIndicator()
                   : ActionButton(
-                      text: "Create Task",
+                      text: "Save",
                       onPressed: () async {
                         final viewModel = context.read<TaskViewModel>();
 
@@ -444,18 +373,10 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                           );
                           return;
                         }
-                        if (selectedPetId == null) {
+                        if (selectedPetId == null || selectedTaskType == null) {
                           AppSnackBar.show(
                             context,
-                            message: "Please select a pet",
-                            type: SnackBarType.error,
-                          );
-                          return;
-                        }
-                        if (selectedTaskType == null) {
-                          AppSnackBar.show(
-                            context,
-                            message: "Please select a task type",
+                            message: "Please select pet and task type",
                             type: SnackBarType.error,
                           );
                           return;
@@ -472,7 +393,8 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                         final timeString =
                             "${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}";
 
-                        final success = await viewModel.createTask(
+                        final success = await viewModel.updateTask(
+                          taskId: widget.task.id,
                           taskTitle: taskTitleController.text.trim(),
                           petId: selectedPetId!,
                           taskType: selectedTaskType!,
@@ -492,15 +414,10 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                             type: SnackBarType.error,
                           );
                         } else if (success) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const DashboardView(),
-                            ),
-                          );
+                          Navigator.pop(context);
                           AppSnackBar.show(
                             context,
-                            message: "Task added successfully!",
+                            message: "Task updated successfully!",
                             type: SnackBarType.success,
                           );
                         }
@@ -513,4 +430,86 @@ class _AddTaskFormState extends State<_AddTaskForm> {
       ),
     );
   }
+
+  // Future<void> _handleSave() async {
+  //   final viewModel = context.read<TaskViewModel>();
+
+  //   if (taskTitleController.text.trim().isEmpty) {
+  //     AppSnackBar.show(
+  //       context,
+  //       message: "Task title is required",
+  //       type: SnackBarType.error,
+  //     );
+  //     return;
+  //   }
+  //   if (selectedPetId == null || selectedTaskType == null) {
+  //     AppSnackBar.show(
+  //       context,
+  //       message: "Please ensure all fields are selected",
+  //       type: SnackBarType.error,
+  //     );
+  //     return;
+  //   }
+  //   if (selectedDate == null || selectedTime == null) {
+  //     AppSnackBar.show(
+  //       context,
+  //       message: "Date and Time are required",
+  //       type: SnackBarType.error,
+  //     );
+  //     return;
+  //   }
+
+  //   final timeString =
+  //       "${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}";
+
+  //   // You need to ensure your TaskViewModel has an updateTask method similar to this
+  //   final success = await viewModel.updateTask(
+  //     taskId: widget.task.id,
+  //     taskTitle: taskTitleController.text.trim(),
+  //     petId: selectedPetId!,
+  //     taskType: selectedTaskType!,
+  //     date: selectedDate!,
+  //     time: timeString,
+  //     repeat: repeat,
+  //     notes: notesController.text.trim().isEmpty
+  //         ? null
+  //         : notesController.text.trim(),
+  //     reminder: reminder,
+  //   );
+
+  //   if (viewModel.errorMessage != null) {
+  //     AppSnackBar.show(
+  //       context,
+  //       message: viewModel.errorMessage!,
+  //       type: SnackBarType.error,
+  //     );
+  //   } else if (success) {
+  //     Navigator.pop(context); // Return to previous screen
+  //     AppSnackBar.show(
+  //       context,
+  //       message: "Task updated successfully!",
+  //       type: SnackBarType.success,
+  //     );
+  //   }
+  // }
+
+  // Helper Widget for Labels
+  Widget _buildSectionLabel(String text) {
+    return SizedBox(
+      width: 330,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(text, style: _labelStyle),
+        ),
+      ),
+    );
+  }
+
+  static const TextStyle _labelStyle = TextStyle(
+    fontFamily: "Poppins-Medium",
+    fontSize: 14,
+    color: AppColors.textPrimary,
+  );
 }
