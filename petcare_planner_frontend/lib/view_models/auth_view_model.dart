@@ -35,36 +35,22 @@ class AuthViewModel extends ChangeNotifier {
     await loadUserFromPrefs();
   }
 
+  static const _userKey = 'logged_in_user';
+
   Future<void> saveUserToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    if (_user != null && _token != null) {
-      prefs.setString('token', _token!);
-      prefs.setString('username', _user!.username);
-      prefs.setString('email', _user!.email);
-      if (_user!.profileImageUrl != null) {
-        prefs.setString('profileImageUrl', _user!.profileImageUrl!);
-      } else {
-        prefs.remove('profileImageUrl');
-      }
+    if (_user != null) {
+      await prefs.setString(_userKey, jsonEncode(_user!.toJson()));
     }
   }
 
   Future<void> loadUserFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final username = prefs.getString('username');
-    final email = prefs.getString('email');
-    final profileImageUrl = prefs.getString('profileImageUrl');
+    final userString = prefs.getString(_userKey);
 
-    if (token != null && username != null && email != null) {
-      _token = token;
-      _user = User(
-        username: username,
-        email: email,
-        id: '',
-        token: '',
-        profileImageUrl: profileImageUrl,
-      );
+    if (userString != null) {
+      _user = User.fromJson(jsonDecode(userString));
+      _token = _user!.token;
       notifyListeners();
     }
   }
@@ -184,6 +170,32 @@ class AuthViewModel extends ChangeNotifier {
       }
     } catch (e) {
       throw Exception('Error picking/uploading image: $e');
+    }
+  }
+
+  Future<void> updateProfile({
+    required String username,
+    required String email,
+  }) async {
+    if (_user == null || _token == null) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final result = await _authService.updateProfile(username, email, _token!);
+
+      _user = _user!.copyWith(
+        username: result['data']['username'],
+        email: result['data']['email'],
+      );
+
+      await saveUserToPrefs();
+    } catch (e) {
+      throw Exception(e.toString());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 }
