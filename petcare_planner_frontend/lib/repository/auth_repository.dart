@@ -68,4 +68,19 @@ class AuthRepository {
     final user = await getSavedUser();
     return user != null;
   }
+
+  /// --- CHANGE PASSWORD ---
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+    required String token,
+  }) async {
+    await _authService.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+      confirmNewPassword: confirmNewPassword,
+      token: token,
+    );
+  }
 }

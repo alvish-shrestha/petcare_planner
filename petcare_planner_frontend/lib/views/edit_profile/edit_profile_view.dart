@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/modal/change_password_modal.dart';
 import 'package:petcare_planner_frontend/utils/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
@@ -218,7 +219,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: Colors.transparent,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(18),
-                          onTap: () {},
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (context) {
+                                return const ChangePasswordModal();
+                              },
+                            );
+                          },
+                          // ---------------------------------------------
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: Row(
@@ -243,8 +253,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
-
-                    // ... inside the Column children ...
                     const SizedBox(height: 25),
 
                     // --- DELETE ACCOUNT SECTION ---
@@ -261,9 +269,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ),
                             ),
                             child: Container(
-                              padding: const EdgeInsets.only(
-                                bottom: 3,
-                              ),
+                              padding: const EdgeInsets.only(bottom: 3),
                               decoration: const BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
