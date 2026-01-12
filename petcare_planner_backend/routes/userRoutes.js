@@ -6,6 +6,7 @@ const {
   loginUser,
   updateProfile,
   changePassword,
+  deleteUser,
 } = require("../controllers/userController");
 
 const {
@@ -24,8 +25,11 @@ router.post("/login", loginUser);
 // --- Update User Profile ---
 router.put("/updateProfile", authMiddleware, updateProfile);
 
-// --- Update User Profile ---
+// --- Change Password ---
 router.put("/change-password", authMiddleware, changePassword);
+
+// --- Delete User Profile ---
+router.delete("/deleteUser", authMiddleware, deleteUser);
 
 // --- Upload Profile Image ---
 router.post(
