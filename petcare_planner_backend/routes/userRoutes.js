@@ -5,6 +5,7 @@ const {
   registerUser,
   loginUser,
   updateProfile,
+  changePassword,
 } = require("../controllers/userController");
 
 const {
@@ -22,6 +23,9 @@ router.post("/login", loginUser);
 
 // --- Update User Profile ---
 router.put("/updateProfile", authMiddleware, updateProfile);
+
+// --- Update User Profile ---
+router.put("/change-password", authMiddleware, changePassword);
 
 // --- Upload Profile Image ---
 router.post(
