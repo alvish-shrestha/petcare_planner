@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/modal/auth_modal.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/views/dashboard/dashboard.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
@@ -73,7 +74,7 @@ class LoginForm extends StatelessWidget {
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
                             onTap: () {
-                              // TODO
+                              AuthModals.showForgotPassword(context);
                             },
                             child: Text(
                               "Forgot Password?",

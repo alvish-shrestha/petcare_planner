@@ -105,13 +105,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           child: isLogin
                               ? LoginForm(
                                   key: const ValueKey("login"),
-                                  onLoginSuccess: () {
-                                    // Navigate on success, e.g.
-                                    // Navigator.pushReplacementNamed(
-                                    //   context,
-                                    //   '/home',
-                                    // );
-                                  },
+                                  onLoginSuccess: () {},
                                   emailController: loginEmailController,
                                   passwordController: loginPasswordController,
                                   authViewModel: authVM,
