@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-const { registerUser, loginUser } = require("../controllers/userController");
+const {
+  registerUser,
+  loginUser,
+  updateProfile,
+} = require("../controllers/userController");
 
 const {
   uploadMiddleware,
@@ -15,6 +19,9 @@ router.post("/register", registerUser);
 
 // --- Login User ---
 router.post("/login", loginUser);
+
+// --- Update User Profile ---
+router.put("/updateProfile", authMiddleware, updateProfile);
 
 // --- Upload Profile Image ---
 router.post(

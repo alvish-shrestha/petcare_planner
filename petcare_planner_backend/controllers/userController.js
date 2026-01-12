@@ -60,7 +60,7 @@ exports.registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
-      username: username.toLowerCase(),
+      username: username,
       email: email.toLowerCase(),
       password: hashedPassword,
     });
@@ -133,6 +133,41 @@ exports.loginUser = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Server Error",
+    });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { username, email } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (username) user.username = username;
+    if (email) user.email = email.toLowerCase();
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: {
+        username: user.username,
+        email: user.email,
+        profileImageUrl: user.profileImageUrl,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
     });
   }
 };

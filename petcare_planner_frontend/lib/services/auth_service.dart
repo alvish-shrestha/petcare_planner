@@ -44,4 +44,26 @@ class AuthService {
       throw Exception(jsonDecode(response.body)['message'] ?? 'Login failed');
     }
   }
+
+  /// --- Update Profile ---
+  Future<Map<String, dynamic>> updateProfile(
+    String username,
+    String email,
+    String token,
+  ) async {
+    final response = await http.put(
+      Uri.parse('${ApiConfig.baseUrl}/api/auth/updateProfile'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'username': username, 'email': email}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception(jsonDecode(response.body)['message']);
+    }
+  }
 }

@@ -6,7 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class RewardService {
   Future<String?> _getTokenFromStorage() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
+    final userString = prefs.getString('logged_in_user');
+    if (userString == null) return null;
+
+    final userJson = jsonDecode(userString);
+    return userJson['token'] ?? '';
   }
 
   Future<Map<String, dynamic>> fetchRewardSummary() async {

@@ -9,11 +9,33 @@ import 'package:petcare_planner_frontend/widgets/custom_text_field.dart';
 import 'package:petcare_planner_frontend/widgets/profile_avatar_selector.dart';
 import 'package:provider/provider.dart';
 
-class EditProfileScreen extends StatelessWidget {
-  EditProfileScreen({super.key});
+class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({super.key});
 
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  late TextEditingController _usernameController;
+  late TextEditingController _emailController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final user = context.read<AuthViewModel>().user;
+
+    _usernameController = TextEditingController(text: user?.username ?? '');
+    _emailController = TextEditingController(text: user?.email ?? '');
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,8 +208,29 @@ class EditProfileScreen extends StatelessWidget {
                 ),
                 child: ActionButton(
                   text: "Save",
-                  onPressed: () {
-                    // TODO
+                  onPressed: () async {
+                    final authVM = context.read<AuthViewModel>();
+
+                    try {
+                      await authVM.updateProfile(
+                        username: _usernameController.text.trim(),
+                        email: _emailController.text.trim(),
+                      );
+
+                      AppSnackBar.show(
+                        context,
+                        message: "Profile updated successfully",
+                        type: SnackBarType.success,
+                      );
+
+                      Navigator.pop(context);
+                    } catch (e) {
+                      AppSnackBar.show(
+                        context,
+                        message: e.toString(),
+                        type: SnackBarType.error,
+                      );
+                    }
                   },
                 ),
               ),
