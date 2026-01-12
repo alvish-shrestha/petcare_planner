@@ -90,8 +90,6 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                 children: [
                   // --- Back Button on left ---
                   Container(
-                    width: 40,
-                    height: 40,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
@@ -104,7 +102,11 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                       ],
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.chevron_left, color: Colors.black),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        size: 18,
+                        color: AppColors.textPrimary,
+                      ),
                       onPressed: () {
                         Navigator.pop(context);
                       },

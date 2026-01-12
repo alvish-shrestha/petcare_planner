@@ -9,7 +9,6 @@ class ProfileCard extends StatelessWidget {
   final String email;
   final String? profileImageUrl;
   final VoidCallback? onEdit;
-  final VoidCallback? onAvatarTap;
 
   const ProfileCard({
     super.key,
@@ -17,7 +16,6 @@ class ProfileCard extends StatelessWidget {
     required this.email,
     this.profileImageUrl,
     this.onEdit,
-    this.onAvatarTap,
   });
 
   BoxDecoration _cardDecoration() {
@@ -42,7 +40,6 @@ class ProfileCard extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: onAvatarTap,
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,

@@ -69,7 +69,6 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -163,8 +162,6 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
 
   Widget _backButton(BuildContext context) {
     return Container(
-      width: 40,
-      height: 40,
       decoration: const BoxDecoration(
         color: Colors.white,
         shape: BoxShape.circle,
@@ -177,7 +174,11 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
         ],
       ),
       child: IconButton(
-        icon: const Icon(Icons.chevron_left, color: Colors.black),
+        icon: const Icon(
+          Icons.arrow_back_ios_new,
+          size: 18,
+          color: AppColors.textPrimary,
+        ),
         onPressed: () => Navigator.pop(context),
       ),
     );
