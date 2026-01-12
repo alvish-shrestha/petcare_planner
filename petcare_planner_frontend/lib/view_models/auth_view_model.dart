@@ -112,6 +112,7 @@ class AuthViewModel extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('logged_in_user');
+      await prefs.setBool('isLoggedIn', false);
 
       _user = null;
       _token = null;

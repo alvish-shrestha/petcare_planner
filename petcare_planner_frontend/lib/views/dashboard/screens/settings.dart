@@ -170,25 +170,63 @@ class Settings extends StatelessWidget {
                   }
 
                   if (petVM.pets.isEmpty) {
-                    return const Center(child: Text("No pets found"));
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "No pets found",
+                          style: TextStyle(
+                            fontFamily: "Poppins-Medium",
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const AddPetScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.add, color: Colors.white),
+                            label: const Text(
+                              "Add New Pet",
+                              style: TextStyle(
+                                fontFamily: "Poppins-Medium",
+                                fontSize: 15,
+                                color: Colors.white,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              elevation: 0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
                   }
 
-                  return Padding(
-                    padding: const EdgeInsets.all(0),
-                    child: MyPetsSection(
-                      pets: petVM.pets,
-                      onAddNewPet: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AddPetScreen(),
-                          ),
-                        );
-                      },
-                      onPetTap: (pet) {
-                        // TODO
-                      },
-                    ),
+                  return MyPetsSection(
+                    pets: petVM.pets,
+                    onAddNewPet: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AddPetScreen()),
+                      );
+                    },
+                    onPetTap: (pet) {
+                      // TODO
+                    },
                   );
                 },
               ),
