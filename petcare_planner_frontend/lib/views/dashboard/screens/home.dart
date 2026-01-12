@@ -35,29 +35,89 @@ class Home extends StatelessWidget {
 
     showModalBottomSheet(
       context: context,
+      backgroundColor: AppColors.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) {
         return ListView.separated(
           padding: const EdgeInsets.all(16),
-          itemCount: vm.pets.length,
-          separatorBuilder: (_, _) => const Divider(),
+          itemCount: vm.pets.length + 1,
+          separatorBuilder: (_, _) =>
+              Divider(color: AppColors.textPrimary.withOpacity(0.1)),
           itemBuilder: (context, index) {
+            if (index == vm.pets.length) {
+              return ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 5,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  // Icon color matching text
+                  child: const Icon(Icons.add, color: AppColors.textPrimary),
+                ),
+                title: const Text(
+                  "Add New Pet",
+                  style: TextStyle(
+                    fontFamily: "Poppins-Bold",
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AddPetScreen()),
+                  );
+                },
+              );
+            }
+
             final pet = vm.pets[index];
             final isSelected = pet.id == vm.selectedPet?.id;
 
             return ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
               leading: CircleAvatar(
+                backgroundColor: Colors.white,
                 backgroundImage: pet.petImage != null
                     ? NetworkImage(PetApiUtils.getFullImageUrl(pet.petImage!))
                     : null,
-                child: pet.petImage == null ? const Icon(Icons.pets) : null,
+                child: pet.petImage == null
+                    ? const Icon(
+                        Icons.pets,
+                        color: AppColors.textPrimary,
+                        size: 20,
+                      )
+                    : null,
               ),
-              title: Text(pet.petName),
-              subtitle: Text('${pet.breed} • Age ${pet.age}'),
+              title: Text(
+                pet.petName,
+                style: const TextStyle(
+                  fontFamily: "Poppins-Bold",
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              subtitle: Text(
+                '${pet.breed} • Age ${pet.age}',
+                style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 12,
+                  color: AppColors.textPrimary.withOpacity(0.7),
+                ),
+              ),
               trailing: isSelected
-                  ? const Icon(Icons.check, color: Colors.green)
+                  ? const Icon(Icons.check, color: AppColors.textPrimary)
                   : null,
               onTap: () {
                 vm.selectPet(pet);
@@ -109,9 +169,6 @@ class Home extends StatelessWidget {
                     children: [
                       Consumer<AuthViewModel>(
                         builder: (context, authVM, _) {
-                          print(
-                            "Home widget build: pets count = ${petVM.pets.length}",
-                          );
                           final username = authVM.user?.username ?? 'User';
                           return Text(
                             'Hi, $username! 👋',
@@ -217,7 +274,6 @@ class Home extends StatelessWidget {
                             const SizedBox(height: 8),
                             TextButton(
                               onPressed: () {
-                                print('Navigating to AddPetScreen');
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

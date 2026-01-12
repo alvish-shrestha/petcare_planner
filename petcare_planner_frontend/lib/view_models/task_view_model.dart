@@ -64,6 +64,64 @@ class TaskViewModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateTask({
+    required String taskId,
+    required String taskTitle,
+    required String petId,
+    required String taskType,
+    required DateTime date,
+    required String time,
+    String repeat = 'None',
+    String? notes,
+    bool reminder = false,
+  }) async {
+    _setLoading(true);
+    errorMessage = null;
+
+    try {
+      final updateData = {
+        'taskTitle': taskTitle,
+        'petId': petId,
+        'taskType': taskType,
+        'date': date.toIso8601String(),
+        'time': time,
+        'repeat': repeat,
+        'notes': notes,
+        'reminder': reminder,
+      };
+
+      await _repository.updateTask(id: taskId, updateData: updateData);
+
+      final index = tasks.indexWhere((t) => t.id == taskId);
+      if (index != -1) {
+        final oldTask = tasks[index];
+        final updatedTask = Task(
+          id: taskId,
+          taskTitle: taskTitle,
+          pet: oldTask.pet,
+          taskType: taskType,
+          date: date,
+          time: time,
+          repeat: repeat,
+          notes: notes,
+          reminder: reminder,
+        );
+
+        tasks[index] = updatedTask;
+
+        // 3. Notify the UI to rebuild
+        notifyListeners();
+      }
+
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   /// --- Delete Task ---
   Future<bool> deleteTask(String id) async {
     _setLoading(true);
