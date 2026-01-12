@@ -93,4 +93,43 @@ class AuthService {
       throw Exception(jsonDecode(response.body)['message']);
     }
   }
+
+  /// --- Forgot Password ---
+  Future<void> forgotPassword(String email) async {
+    final response = await http.post(
+      Uri.parse('${ApiConfig.baseUrl}/api/auth/request-reset'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        jsonDecode(response.body)['message'] ?? 'Failed to send reset link',
+      );
+    }
+  }
+
+  /// --- Reset Password ---
+  Future<void> resetPassword(
+    String token,
+    String newPassword,
+    String confirmPassword,
+  ) async {
+    final response = await http.post(
+      Uri.parse(
+        '${ApiConfig.baseUrl}/api/auth/reset-password/$token',
+      ), // Adjust URL based on your backend
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'password': newPassword,
+        'confirmPassword': confirmPassword,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        jsonDecode(response.body)['message'] ?? 'Failed to reset password',
+      );
+    }
+  }
 }
