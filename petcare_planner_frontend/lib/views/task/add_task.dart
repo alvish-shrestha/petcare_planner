@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/services/notification_service.dart';
+import 'package:petcare_planner_frontend/view_models/notification_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
@@ -77,18 +78,27 @@ class _AddTaskFormState extends State<_AddTaskForm> {
       selectedTime!.hour,
       selectedTime!.minute,
     );
-    final DateTime notificationTime = scheduledDateTime.subtract(
+
+    DateTime notificationTime = scheduledDateTime.subtract(
       const Duration(minutes: 15),
     );
 
+    if (notificationTime.isBefore(DateTime.now()) &&
+        scheduledDateTime.isAfter(DateTime.now())) {
+      notificationTime = DateTime.now().add(const Duration(seconds: 5));
+    }
+
     if (notificationTime.isAfter(DateTime.now())) {
-      int notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      int notificationId = DateTime.now().millisecondsSinceEpoch.remainder(
+        100000,
+      );
 
       await NotificationService().scheduleNotification(
         id: notificationId,
-        title: 'Upcoming: $selectedTaskType for $petName',
-        body: '${taskTitleController.text} starts in 15 minutes!',
+        title: 'Reminder: $selectedTaskType for $petName',
+        body: '${taskTitleController.text} is coming up soon!',
         scheduledTime: notificationTime,
+        type: selectedTaskType ?? 'general',
       );
     }
   }
@@ -526,8 +536,18 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                                 .firstWhere((p) => p.id == selectedPetId)
                                 .petName;
 
-                            // Trigger the schedule
+                            // --- Trigger the schedule ---
                             await _handleNotificationScheduling(petName);
+
+                            context
+                                .read<NotificationViewModel>()
+                                .addInstantNotification(
+                                  title: 'New Task: $selectedTaskType',
+                                  body:
+                                      'Task "${taskTitleController.text}" scheduled for $petName',
+                                  type: selectedTaskType!.toLowerCase(),
+                                );
+
                             debugPrint(
                               "Notification logic executed for $petName",
                             );
