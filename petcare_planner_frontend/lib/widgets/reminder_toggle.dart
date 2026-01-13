@@ -4,8 +4,16 @@ import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 class ReminderToggle extends StatefulWidget {
   final bool initialValue;
   final ValueChanged<bool>? onChanged;
+  final String title;
+  final String subtitle;
 
-  const ReminderToggle({super.key, this.initialValue = true, this.onChanged});
+  const ReminderToggle({
+    super.key,
+    this.initialValue = true,
+    this.onChanged,
+    this.title = "Set Reminder",
+    this.subtitle = "Get notified 15 min before",
+  });
 
   @override
   State<ReminderToggle> createState() => _ReminderToggleState();

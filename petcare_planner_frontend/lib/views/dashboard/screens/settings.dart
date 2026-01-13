@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/modal/logout_modal.dart';
+import 'package:petcare_planner_frontend/view_models/settings_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
@@ -20,6 +21,8 @@ class Settings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsVM = context.watch<SettingsViewModel>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -105,9 +108,9 @@ class Settings extends StatelessWidget {
                     iconColor: Colors.redAccent,
                     title: "Push Notifications",
                     subtitle: "Receive alerts for tasks and reminders",
-                    value: true,
+                    value: settingsVM.pushNotifications,
                     onChanged: (val) {
-                      /* handle toggle */
+                      settingsVM.togglePushNotifications(val);
                     },
                     activeTrackColor: Colors.redAccent,
                   ),
@@ -117,9 +120,9 @@ class Settings extends StatelessWidget {
                     iconColor: Colors.green,
                     title: "Task Reminders",
                     subtitle: "Get notified before scheduled tasks",
-                    value: true,
+                    value: settingsVM.taskReminders, // Real Value
                     onChanged: (val) {
-                      /* handle toggle */
+                      settingsVM.toggleTaskReminders(val);
                     },
                     activeTrackColor: Colors.green,
                   ),
@@ -129,9 +132,9 @@ class Settings extends StatelessWidget {
                     iconColor: Colors.blue,
                     title: "Sound & Vibration",
                     subtitle: "Enable notification sounds",
-                    value: true,
+                    value: settingsVM.soundEnabled, // Real Value
                     onChanged: (val) {
-                      /* handle toggle */
+                      settingsVM.toggleSound(val);
                     },
                     activeTrackColor: Colors.blue,
                   ),

@@ -1,10 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/services/notification_service.dart'; // <--- Import Service
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/frequency_selector.dart';
 import 'package:provider/provider.dart';
-import 'package:petcare_planner_frontend/models/task.dart'; // Import your Task model
+import 'package:petcare_planner_frontend/models/task.dart';
 import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
@@ -91,6 +92,40 @@ class _EditTaskFormState extends State<_EditTaskForm> {
     super.dispose();
   }
 
+  // --- Notification Update Logic ---
+  Future<void> _handleNotificationUpdate(String petName) async {
+    final int notificationId = widget.task.id.hashCode;
+
+    await NotificationService().cancel(notificationId);
+
+    if (!reminder || selectedDate == null || selectedTime == null) return;
+
+    // 4. Calculate new time
+    final DateTime scheduledDateTime = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      selectedTime!.hour,
+      selectedTime!.minute,
+    );
+
+    // 15 Minutes before
+    final DateTime notificationTime = scheduledDateTime.subtract(
+      const Duration(minutes: 15),
+    );
+
+    // 5. Schedule if in the future
+    if (notificationTime.isAfter(DateTime.now())) {
+      await NotificationService().scheduleNotification(
+        id: notificationId,
+        title: 'Upcoming: $selectedTaskType for $petName',
+        body: '${taskTitleController.text} starts in 15 minutes!',
+        scheduledTime: notificationTime,
+      );
+      debugPrint("Updated Notification Scheduled for: $notificationTime");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> taskTypes = [
@@ -115,7 +150,6 @@ class _EditTaskFormState extends State<_EditTaskForm> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Back Button
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -137,7 +171,6 @@ class _EditTaskFormState extends State<_EditTaskForm> {
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  // Title
                   const Text(
                     "Edit Task",
                     style: TextStyle(
@@ -344,6 +377,7 @@ class _EditTaskFormState extends State<_EditTaskForm> {
               width: 330,
               child: ReminderToggle(
                 initialValue: reminder,
+                subtitle: "Get notified 15 min before",
                 onChanged: (val) => setState(() => reminder = val),
               ),
             ),
@@ -414,6 +448,20 @@ class _EditTaskFormState extends State<_EditTaskForm> {
                             type: SnackBarType.error,
                           );
                         } else if (success) {
+                          // --- NOTIFICATION UPDATE LOGIC START ---
+                          try {
+                            final petName = petViewModel.pets
+                                .firstWhere(
+                                  (p) => p.id == selectedPetId,
+                                  orElse: () => widget.task.pet,
+                                )
+                                .petName;
+
+                            await _handleNotificationUpdate(petName);
+                          } catch (e) {
+                            debugPrint("Error updating notification: $e");
+                          }
+
                           Navigator.pop(context);
                           AppSnackBar.show(
                             context,
@@ -430,68 +478,6 @@ class _EditTaskFormState extends State<_EditTaskForm> {
       ),
     );
   }
-
-  // Future<void> _handleSave() async {
-  //   final viewModel = context.read<TaskViewModel>();
-
-  //   if (taskTitleController.text.trim().isEmpty) {
-  //     AppSnackBar.show(
-  //       context,
-  //       message: "Task title is required",
-  //       type: SnackBarType.error,
-  //     );
-  //     return;
-  //   }
-  //   if (selectedPetId == null || selectedTaskType == null) {
-  //     AppSnackBar.show(
-  //       context,
-  //       message: "Please ensure all fields are selected",
-  //       type: SnackBarType.error,
-  //     );
-  //     return;
-  //   }
-  //   if (selectedDate == null || selectedTime == null) {
-  //     AppSnackBar.show(
-  //       context,
-  //       message: "Date and Time are required",
-  //       type: SnackBarType.error,
-  //     );
-  //     return;
-  //   }
-
-  //   final timeString =
-  //       "${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}";
-
-  //   // You need to ensure your TaskViewModel has an updateTask method similar to this
-  //   final success = await viewModel.updateTask(
-  //     taskId: widget.task.id,
-  //     taskTitle: taskTitleController.text.trim(),
-  //     petId: selectedPetId!,
-  //     taskType: selectedTaskType!,
-  //     date: selectedDate!,
-  //     time: timeString,
-  //     repeat: repeat,
-  //     notes: notesController.text.trim().isEmpty
-  //         ? null
-  //         : notesController.text.trim(),
-  //     reminder: reminder,
-  //   );
-
-  //   if (viewModel.errorMessage != null) {
-  //     AppSnackBar.show(
-  //       context,
-  //       message: viewModel.errorMessage!,
-  //       type: SnackBarType.error,
-  //     );
-  //   } else if (success) {
-  //     Navigator.pop(context); // Return to previous screen
-  //     AppSnackBar.show(
-  //       context,
-  //       message: "Task updated successfully!",
-  //       type: SnackBarType.success,
-  //     );
-  //   }
-  // }
 
   // Helper Widget for Labels
   Widget _buildSectionLabel(String text) {

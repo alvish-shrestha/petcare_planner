@@ -1,7 +1,8 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, unnecessary_underscores
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/utils/pet_api_utils.dart';
+import 'package:petcare_planner_frontend/views/notification/notification_screen.dart';
 import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
@@ -43,7 +44,7 @@ class Home extends StatelessWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(16),
           itemCount: vm.pets.length + 1,
-          separatorBuilder: (_, _) =>
+          separatorBuilder: (_, __) =>
               Divider(color: AppColors.textPrimary.withOpacity(0.1)),
           itemBuilder: (context, index) {
             if (index == vm.pets.length) {
@@ -187,7 +188,13 @@ class Home extends StatelessWidget {
                         offset: const Offset(0, -8),
                         child: GestureDetector(
                           onTap: () {
-                            // TODO
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const NotificationScreen(),
+                              ),
+                            );
                           },
                           child: Container(
                             height: 40,

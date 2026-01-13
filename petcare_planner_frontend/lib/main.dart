@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/services/notification_service.dart';
 import 'package:petcare_planner_frontend/view_models/dashboard_view_model.dart';
+import 'package:petcare_planner_frontend/view_models/notification_view_model.dart';
+import 'package:petcare_planner_frontend/view_models/settings_view_model.dart';
 import 'package:provider/provider.dart';
 
 import 'package:petcare_planner_frontend/petcare_planner.dart';
@@ -13,7 +16,13 @@ import 'package:petcare_planner_frontend/repository/task_repository.dart';
 import 'package:petcare_planner_frontend/services/pet_service.dart';
 import 'package:petcare_planner_frontend/services/task_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await NotificationService().init();
+
+  await NotificationService().requestPermissions();
+
   runApp(
     MultiProvider(
       providers: [
@@ -32,6 +41,14 @@ void main() {
 
         /// --- Dashboard ---
         ChangeNotifierProvider(create: (_) => DashboardViewModel()),
+
+        /// --- Settings ---
+        ChangeNotifierProvider(create: (_) => SettingsViewModel()),
+
+        /// --- Notifications ---
+        ChangeNotifierProvider(
+          create: (_) => NotificationViewModel()..loadNotifications(),
+        ),
       ],
       child: const PetcarePlanner(),
     ),
