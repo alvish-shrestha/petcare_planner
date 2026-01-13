@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:petcare_planner_frontend/views/notification/notification_screen.dart';
 import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/calendar.dart';
@@ -70,7 +71,12 @@ class _CalendarState extends State<Calendar> {
                   offset: const Offset(0, -8),
                   child: GestureDetector(
                     onTap: () {
-                      // TODO: handle notification tap
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const NotificationScreen(),
+                        ),
+                      );
                     },
                     child: Container(
                       height: 40,
