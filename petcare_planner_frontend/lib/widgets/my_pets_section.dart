@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/models/pet.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/utils/pet_api_utils.dart';
 
 class MyPetsSection extends StatelessWidget {

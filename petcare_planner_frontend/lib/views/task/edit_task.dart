@@ -5,7 +5,7 @@ import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/frequency_selector.dart';
 import 'package:provider/provider.dart';
 import 'package:petcare_planner_frontend/models/task.dart'; // Import your Task model
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/models/nav_items.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
-import '../../utils/app_animations.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
+import '../app_animations.dart';
 
 class NavButton extends StatelessWidget {
   final NavItem item;

@@ -2,7 +2,7 @@
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 
 enum SnackBarType { success, error, info }
 
@@ -62,7 +62,7 @@ class AppSnackBar {
                     message,
                     style: const TextStyle(
                       fontFamily: "Poppins",
-                      color: AppColors.textPrimary,
+                      color: AppColors.strongText,
                       fontSize: 14,
                       shadows: [
                         Shadow(

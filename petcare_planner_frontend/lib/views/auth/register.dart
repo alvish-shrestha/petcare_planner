@@ -62,6 +62,7 @@ class RegisterForm extends StatelessWidget {
                         child: AuthTextField(
                           hint: "Email",
                           controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
                         ),
                       ),
                       SizedBox(

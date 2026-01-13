@@ -8,6 +8,7 @@ const {
   changePassword,
   deleteUser,
   sendResetLink,
+  verifyOtp,
   resetPassword,
 } = require("../controllers/userController");
 
@@ -33,11 +34,14 @@ router.put("/change-password", authMiddleware, changePassword);
 /// --- Delete User Profile ---
 router.delete("/deleteUser", authMiddleware, deleteUser);
 
-/// --- Request link sent ---
-router.post("/request-reset", sendResetLink);
+/// --- Send OTP Code ---
+router.post("/forgot-password", sendResetLink);
+
+/// --- Verify OTP Code ---
+router.post("/verify-otp", verifyOtp);
 
 /// --- Reset Password ---
-router.post("/reset-password/:token", resetPassword);
+router.post("/reset-password", resetPassword);
 
 // --- Upload Profile Image ---
 router.post(

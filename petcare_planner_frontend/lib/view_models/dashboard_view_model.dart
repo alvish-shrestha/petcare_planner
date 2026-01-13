@@ -11,4 +11,9 @@ class DashboardViewModel extends ChangeNotifier {
     _currentTab = tab;
     notifyListeners();
   }
+
+  void reset() {
+    _currentTab = NavItem.home;
+    notifyListeners();
+  }
 }

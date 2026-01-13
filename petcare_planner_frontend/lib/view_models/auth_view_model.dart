@@ -1,13 +1,17 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:petcare_planner_frontend/models/user.dart';
 // import 'package:petcare_planner_frontend/repository/auth_repository.dart';
 import 'package:petcare_planner_frontend/services/auth_service.dart';
 import 'package:petcare_planner_frontend/utils/api_config.dart';
+import 'package:petcare_planner_frontend/view_models/dashboard_view_model.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthViewModel extends ChangeNotifier {
@@ -108,8 +112,10 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     try {
+      Provider.of<DashboardViewModel>(context, listen: false).reset();
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('logged_in_user');
       await prefs.setBool('isLoggedIn', false);
@@ -233,7 +239,7 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteAccount() async {
+  Future<void> deleteAccount(BuildContext context) async {
     if (_token == null) {
       _errorMessage = 'User not authenticated';
       notifyListeners();
@@ -251,7 +257,8 @@ class AuthViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        await logout();
+        // ✅ Fixed: Passing context to logout
+        await logout(context);
       } else {
         final jsonResp = jsonDecode(response.body);
         throw Exception(jsonResp['message'] ?? 'Failed to delete account');
@@ -264,15 +271,25 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> forgotPassword(String email) async {
+  Future<void> sendOtp(String email) async {
     _isLoading = true;
-    _errorMessage = null;
     notifyListeners();
-
     try {
-      await _authService.forgotPassword(email);
+      await _authService.sendOtp(email);
     } catch (e) {
-      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> verifyOtp(String email, String otp) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await _authService.verifyOtp(email, otp);
+    } catch (e) {
       rethrow;
     } finally {
       _isLoading = false;
@@ -281,18 +298,16 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   Future<void> resetPassword(
-    String token,
-    String newPassword,
+    String email,
+    String otp,
+    String password,
     String confirmPassword,
   ) async {
     _isLoading = true;
-    _errorMessage = null;
     notifyListeners();
-
     try {
-      await _authService.resetPassword(token, newPassword, confirmPassword);
+      await _authService.resetPassword(email, otp, password, confirmPassword);
     } catch (e) {
-      _errorMessage = e.toString().replaceAll('Exception: ', '');
       rethrow;
     } finally {
       _isLoading = false;

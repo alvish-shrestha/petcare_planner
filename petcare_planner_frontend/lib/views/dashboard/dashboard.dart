@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/models/nav_items.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/dashboard_view_model.dart';
 import 'package:petcare_planner_frontend/views/dashboard/screens/calendar.dart';
 import 'package:petcare_planner_frontend/views/dashboard/screens/home.dart';

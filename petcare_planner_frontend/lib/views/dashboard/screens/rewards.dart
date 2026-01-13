@@ -5,7 +5,7 @@ import 'package:petcare_planner_frontend/repository/reward_repository.dart';
 import 'package:petcare_planner_frontend/services/reward_service.dart';
 import 'package:petcare_planner_frontend/view_models/reward_view_model.dart';
 import 'package:provider/provider.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:share_plus/share_plus.dart';
 
 class Rewards extends StatelessWidget {

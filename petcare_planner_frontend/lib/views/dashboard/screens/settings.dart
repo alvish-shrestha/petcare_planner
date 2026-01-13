@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/modal/logout_modal.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/views/edit_profile/edit_profile_view.dart';
@@ -57,7 +57,6 @@ class Settings extends StatelessWidget {
                     child: IconButton(
                       icon: const Icon(Icons.logout, color: AppColors.primary),
                       onPressed: () {
-                        // Call the separated LogoutModal
                         showDialog(
                           context: context,
                           builder: (context) => const LogoutModal(),
