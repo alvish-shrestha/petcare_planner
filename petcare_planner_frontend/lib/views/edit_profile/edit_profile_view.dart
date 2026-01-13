@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/modal/change_password_modal.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
@@ -42,61 +42,153 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _showDeleteConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          "Delete Account",
-          style: TextStyle(fontFamily: "Poppins-Bold", fontSize: 20),
-        ),
-        content: const Text(
-          "Are you sure you want to delete your account? This action cannot be undone.",
-          style: TextStyle(fontFamily: "Poppins", fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              "Cancel",
-              style: TextStyle(
-                fontFamily: "Poppins-Medium",
-                color: AppColors.textPrimary,
+      builder: (ctx) => Dialog(
+        backgroundColor: AppColors.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        elevation: 10,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // --- 1. Warning Icon ---
+              Container(
+                height: 70,
+                width: 70,
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1), // Soft red bg
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.red,
+                  size: 36,
+                ),
               ),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              try {
-                final authVM = context.read<AuthViewModel>();
-                await authVM.deleteAccount();
+              const SizedBox(height: 20),
 
-                AppSnackBar.show(
-                  context,
-                  message: "Account deleted successfully",
-                  type: SnackBarType.success,
-                );
+              // --- 2. Title ---
+              const Text(
+                "Delete Account?",
+                style: TextStyle(
+                  fontFamily: "Poppins-Bold",
+                  fontSize: 22,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
 
-                // Navigate to Login or Welcome screen after deletion
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AuthScreen()),
-                  (route) => false,
-                );
-              } catch (e) {
-                AppSnackBar.show(
-                  context,
-                  message: "Failed to delete account: $e",
-                  type: SnackBarType.error,
-                );
-              }
-            },
-            child: const Text(
-              "Delete",
-              style: TextStyle(fontFamily: "Poppins-Medium", color: Colors.red),
-            ),
+              // --- 3. Detailed Warning Message ---
+              const Text(
+                "You are about to permanently delete your account. All your pets, tasks, and data will be lost forever.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 14,
+                  color: Color(0xFF6D4C41), // Slightly softer than black
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "This action cannot be undone.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: "Poppins-Bold",
+                  fontSize: 14,
+                  color: Colors.red, // Highlight this line
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // --- 4. Buttons ---
+              Row(
+                children: [
+                  // Cancel Button
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: TextButton.styleFrom(
+                          backgroundColor: AppColors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(
+                              color: AppColors.primary,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                        child: const Text(
+                          "Cancel",
+                          style: TextStyle(
+                            fontFamily: "Poppins-Medium",
+                            fontSize: 16,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+
+                  // Delete Button
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          Navigator.pop(ctx);
+                          try {
+                            final authVM = context.read<AuthViewModel>();
+                            await authVM.deleteAccount(context);
+
+                            AppSnackBar.show(
+                              context,
+                              message: "Account deleted successfully",
+                              type: SnackBarType.success,
+                            );
+
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AuthScreen(),
+                              ),
+                              (route) => false,
+                            );
+                          } catch (e) {
+                            AppSnackBar.show(
+                              context,
+                              message: "Failed to delete account: $e",
+                              type: SnackBarType.error,
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          "Delete",
+                          style: TextStyle(
+                            fontFamily: "Poppins-Medium",
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

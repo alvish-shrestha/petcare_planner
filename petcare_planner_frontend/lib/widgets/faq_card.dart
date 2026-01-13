@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 
 class FAQCard extends StatefulWidget {
   final String question;

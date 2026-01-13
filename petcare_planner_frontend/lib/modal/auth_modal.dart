@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/auth_text_field.dart';
@@ -9,7 +9,7 @@ import 'package:petcare_planner_frontend/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
 class AuthModals {
-  // ---  Forgot Password Modal ---
+  // --- 1. Forgot Password Modal (Sends OTP) ---
   static void showForgotPassword(BuildContext context) {
     final emailController = TextEditingController();
 
@@ -23,7 +23,7 @@ class AuthModals {
           children: [
             Center(
               child: const Text(
-                "Enter your registered email\naddress to reset your password.",
+                "Enter your registered email\naddress to receive a verification code.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: "Poppins-Medium",
@@ -65,12 +65,19 @@ class AuthModals {
                         : () async {
                             if (emailController.text.isNotEmpty) {
                               try {
-                                await viewModel.forgotPassword(
+                                await viewModel.sendOtp(
                                   emailController.text.trim(),
                                 );
                                 Navigator.pop(context);
 
-                                showConfirmEmail(
+                                AppSnackBar.show(
+                                  context,
+                                  message:
+                                      "OTP sent successfully to your email",
+                                  type: SnackBarType.success,
+                                );
+
+                                showVerifyOtp(
                                   context,
                                   emailController.text.trim(),
                                 );
@@ -92,7 +99,7 @@ class AuthModals {
                     child: viewModel.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
-                            "Send Reset Link",
+                            "Send Code",
                             style: TextStyle(
                               fontFamily: "Poppins-Medium",
                               color: Colors.white,
@@ -109,44 +116,42 @@ class AuthModals {
     );
   }
 
-  // --- Confirm Email Modal ---
-  static void showConfirmEmail(BuildContext context, String email) {
+  // --- 2. Verify OTP Modal (Enter Code) ---
+  static void showVerifyOtp(BuildContext context, String email) {
+    final otpController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (context) => _BaseAuthModal(
-        title: "Confirm Email",
+        title: "Enter Code",
         child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "We sent a verification link to your\nemail address",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: "Poppins-Medium",
-                color: AppColors.textPrimary,
-                fontSize: 15,
-              ),
-            ),
-            const SizedBox(height: 15),
-            Text(
-              email,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: "Poppins-Bold",
-                fontSize: 15,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 15),
             Center(
-              child: const Text(
-                "Please check your inbox and\nclick the verification link to\ncontinue",
+              child: Text(
+                "We sent a 6-digit code to\n$email",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: "Poppins-Medium",
                   color: AppColors.textPrimary,
                   fontSize: 15,
                 ),
               ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Verification Code",
+              style: TextStyle(
+                fontFamily: "Poppins-Medium",
+                fontSize: 13,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            CustomTextField(
+              hint: "123456",
+              controller: otpController,
+              keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 25),
             Consumer<AuthViewModel>(
@@ -165,27 +170,47 @@ class AuthModals {
                     onPressed: viewModel.isLoading
                         ? null
                         : () async {
-                            try {
-                              await viewModel.forgotPassword(email);
+                            if (otpController.text.length >= 4) {
+                              try {
+                                // 1. Verify Code
+                                await viewModel.verifyOtp(
+                                  email,
+                                  otpController.text.trim(),
+                                );
+                                Navigator.pop(context);
 
+                                // ✅ SHOW SUCCESS SNACKBAR
+                                AppSnackBar.show(
+                                  context,
+                                  message: "OTP Verified!",
+                                  type: SnackBarType.success,
+                                );
+
+                                // 2. Go to Reset Password (pass email & otp)
+                                showResetPassword(
+                                  context,
+                                  email,
+                                  otpController.text.trim(),
+                                );
+                              } catch (e) {
+                                AppSnackBar.show(
+                                  context,
+                                  message: e.toString(),
+                                  type: SnackBarType.error,
+                                );
+                              }
+                            } else {
                               AppSnackBar.show(
                                 context,
-                                message:
-                                    "Verification link resent successfully!",
-                                type: SnackBarType.success,
-                              );
-                            } catch (e) {
-                              AppSnackBar.show(
-                                context,
-                                message: "Failed to resend: $e",
-                                type: SnackBarType.error,
+                                message: "Please enter a valid code",
+                                type: SnackBarType.info,
                               );
                             }
                           },
                     child: viewModel.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
-                            "Resend Verification Link",
+                            "Verify",
                             style: TextStyle(
                               fontFamily: "Poppins-Medium",
                               color: Colors.white,
@@ -203,7 +228,11 @@ class AuthModals {
   }
 
   // --- 3. Reset Password Modal ---
-  static void showResetPassword(BuildContext context, String token) {
+  static void showResetPassword(
+    BuildContext context,
+    String email,
+    String otp,
+  ) {
     final passController = TextEditingController();
     final confirmPassController = TextEditingController();
 
@@ -263,12 +292,14 @@ class AuthModals {
                                 confirmPassController.text) {
                               try {
                                 await viewModel.resetPassword(
-                                  token,
+                                  email,
+                                  otp,
                                   passController.text,
                                   confirmPassController.text,
                                 );
                                 Navigator.pop(context);
 
+                                // Success Snackbar
                                 AppSnackBar.show(
                                   context,
                                   message:
@@ -283,7 +314,6 @@ class AuthModals {
                                 );
                               }
                             } else {
-                              // USE CUSTOM SNACKBAR - INFO/ERROR
                               AppSnackBar.show(
                                 context,
                                 message: "Passwords do not match",

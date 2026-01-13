@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 
 class TaskCard extends StatelessWidget {
   final String time;

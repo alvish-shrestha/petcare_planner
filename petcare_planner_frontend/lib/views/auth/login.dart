@@ -55,6 +55,7 @@ class LoginForm extends StatelessWidget {
                         child: AuthTextField(
                           hint: "Email",
                           controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
                         ),
                       ),
 

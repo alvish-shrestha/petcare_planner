@@ -7,7 +7,7 @@ import 'package:petcare_planner_frontend/views/dashboard/dashboard.dart';
 import 'package:petcare_planner_frontend/views/get_started/get_started_one.dart';
 import 'package:petcare_planner_frontend/widgets/slide_fade_route.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
 
 class SplashScreen extends StatefulWidget {

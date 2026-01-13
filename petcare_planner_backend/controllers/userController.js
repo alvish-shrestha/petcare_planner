@@ -292,64 +292,108 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// --- SEND OTP CODE ---
 exports.sendResetLink = async (req, res) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    const token = jwt.sign({ id: user._id }, process.env.SECRET, {
-      expiresIn: "15m",
-    });
-    const resetUrl = process.env.CLIENT_URL + "/password/" + token;
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    user.resetOtp = otp;
+    user.resetOtpExpire = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
     const mailOptions = {
       from: `"PetCare Planner" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: "Reset your password",
-      html: `<p>Reset your password.. ${resetUrl}</p>`,
+      subject: "Password Reset Code",
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; text-align: center;">
+            <h3>Password Reset Request</h3>
+            <p>Your verification code is:</p>
+            <h1 style="color: #7AA895; letter-spacing: 5px; font-size: 32px;">${otp}</h1>
+            <p>This code expires in 10 minutes.</p>
+        </div>
+      `,
     };
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({
-          success: false,
-          message: "Failed",
-        });
-      }
-      if (info) console.log(info);
-      return res.status(200).json({
-        success: true,
-        message: "Reset link sent to your email",
-      });
+
+    transporter.sendMail(mailOptions, (err) => {
+      if (err)
+        return res
+          .status(500)
+          .json({ success: false, message: "Email failed" });
+      return res
+        .status(200)
+        .json({ success: true, message: "OTP sent to email" });
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
+// --- VERIFY OTP ---
+exports.verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+  try {
+    const user = await User.findOne({
+      email,
+      resetOtp: otp,
+      resetOtpExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired code" });
+    }
+
+    return res.status(200).json({ success: true, message: "Code verified" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// --- RESET PASSWORD ---
 exports.resetPassword = async (req, res) => {
-  const { token } = req.params;
-  const { password } = req.body;
+  const { email, otp, password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Passwords do not match" });
+  }
 
   try {
-    const decoded = jwt.verify(token, process.env.SECRET);
-    const hased = await bcrypt.hash(password, 10);
-    await User.findByIdAndUpdate(decoded.id, { password: hased });
-    return res.status(200).json({
-      success: true,
-      message: "Password updated",
+    const user = await User.findOne({
+      email,
+      resetOtp: otp,
+      resetOtpExpire: { $gt: Date.now() },
     });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired session" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+
+    user.resetOtp = null;
+    user.resetOtpExpire = null;
+
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Password updated successfully" });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      success: false,
-      message: "Server error / Token invalid",
-    });
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };

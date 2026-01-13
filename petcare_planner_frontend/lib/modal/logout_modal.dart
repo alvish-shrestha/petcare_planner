@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:petcare_planner_frontend/view_models/auth_view_model.dart';
 import 'package:petcare_planner_frontend/views/auth/auth_screen.dart';
@@ -90,13 +90,16 @@ class LogoutModal extends StatelessWidget {
                   height: 45,
                   child: ElevatedButton(
                     onPressed: () async {
-                      Navigator.of(context).pop();
-
                       final authVM = Provider.of<AuthViewModel>(
                         context,
                         listen: false,
                       );
-                      await authVM.logout();
+
+                      await authVM.logout(context);
+
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
 
                       if (context.mounted) {
                         AppSnackBar.show(

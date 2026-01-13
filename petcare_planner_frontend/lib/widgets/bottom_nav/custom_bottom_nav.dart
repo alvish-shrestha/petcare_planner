@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/models/nav_items.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/widgets/bottom_nav/nav_buttom.dart';
 
 class CustomBottomNav extends StatelessWidget {

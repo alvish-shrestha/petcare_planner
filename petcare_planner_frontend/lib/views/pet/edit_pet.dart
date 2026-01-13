@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/modal/delete_modal.dart';
 import 'package:petcare_planner_frontend/models/pet.dart';
 import 'package:petcare_planner_frontend/utils/api_config.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/action_button.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';

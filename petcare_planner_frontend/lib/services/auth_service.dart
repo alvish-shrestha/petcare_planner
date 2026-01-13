@@ -94,42 +94,49 @@ class AuthService {
     }
   }
 
-  /// --- Forgot Password ---
-  Future<void> forgotPassword(String email) async {
+  // --- Send OTP ---
+  Future<void> sendOtp(String email) async {
     final response = await http.post(
-      Uri.parse('${ApiConfig.baseUrl}/api/auth/request-reset'),
+      Uri.parse('${ApiConfig.baseUrl}/api/auth/forgot-password'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email}),
     );
-
     if (response.statusCode != 200) {
-      throw Exception(
-        jsonDecode(response.body)['message'] ?? 'Failed to send reset link',
-      );
+      throw Exception(jsonDecode(response.body)['message']);
     }
   }
 
-  /// --- Reset Password ---
+  // --- Verify OTP ---
+  Future<void> verifyOtp(String email, String otp) async {
+    final response = await http.post(
+      Uri.parse('${ApiConfig.baseUrl}/api/auth/verify-otp'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'otp': otp}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(jsonDecode(response.body)['message']);
+    }
+  }
+
+  // --- Reset Password ---
   Future<void> resetPassword(
-    String token,
-    String newPassword,
+    String email,
+    String otp,
+    String password,
     String confirmPassword,
   ) async {
     final response = await http.post(
-      Uri.parse(
-        '${ApiConfig.baseUrl}/api/auth/reset-password/$token',
-      ), // Adjust URL based on your backend
+      Uri.parse('${ApiConfig.baseUrl}/api/auth/reset-password'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'password': newPassword,
+        'email': email,
+        'otp': otp,
+        'password': password,
         'confirmPassword': confirmPassword,
       }),
     );
-
     if (response.statusCode != 200) {
-      throw Exception(
-        jsonDecode(response.body)['message'] ?? 'Failed to reset password',
-      );
+      throw Exception(jsonDecode(response.body)['message']);
     }
   }
 }

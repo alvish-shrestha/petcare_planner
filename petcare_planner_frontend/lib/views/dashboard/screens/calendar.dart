@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:petcare_planner_frontend/utils/app_colors.dart';
+import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/calendar.dart';
 import 'package:petcare_planner_frontend/widgets/task_list_view.dart';
