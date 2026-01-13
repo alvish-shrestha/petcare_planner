@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/services/notification_service.dart'; // <--- Import Service
+import 'package:petcare_planner_frontend/view_models/notification_view_model.dart';
 import 'package:petcare_planner_frontend/widgets/app_snackbar.dart';
 import 'package:petcare_planner_frontend/widgets/frequency_selector.dart';
 import 'package:provider/provider.dart';
@@ -121,8 +122,15 @@ class _EditTaskFormState extends State<_EditTaskForm> {
         title: 'Upcoming: $selectedTaskType for $petName',
         body: '${taskTitleController.text} starts in 15 minutes!',
         scheduledTime: notificationTime,
+        type: selectedTaskType!.toLowerCase(),
       );
       debugPrint("Updated Notification Scheduled for: $notificationTime");
+      context.read<NotificationViewModel>().addInstantNotification(
+        title: 'Updated: $selectedTaskType',
+        body:
+            'Task for $petName rescheduled to ${selectedTime!.format(context)}',
+        type: selectedTaskType!.toLowerCase(),
+      );
     }
   }
 

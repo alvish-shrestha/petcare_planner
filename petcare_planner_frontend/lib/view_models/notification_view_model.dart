@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:petcare_planner_frontend/models/notification_item.dart';
+import 'package:petcare_planner_frontend/services/notification_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationViewModel extends ChangeNotifier {
+  final NotificationService _notificationService = NotificationService();
+
   List<NotificationItem> _notifications = [];
   bool _isLoading = false;
 
@@ -11,7 +14,6 @@ class NotificationViewModel extends ChangeNotifier {
 
   // --- Grouping Logic for UI ---
 
-  // Returns notifications created today
   List<NotificationItem> get todayNotifications {
     final now = DateTime.now();
     return _notifications
@@ -24,10 +26,8 @@ class NotificationViewModel extends ChangeNotifier {
         .toList();
   }
 
-  // Returns notifications created yesterday
   List<NotificationItem> get yesterdayNotifications {
-    final now = DateTime.now();
-    final yesterday = now.subtract(const Duration(days: 1));
+    final yesterday = DateTime.now().subtract(const Duration(days: 1));
     return _notifications
         .where(
           (n) =>
@@ -38,24 +38,21 @@ class NotificationViewModel extends ChangeNotifier {
         .toList();
   }
 
-  // Returns older notifications
   List<NotificationItem> get olderNotifications {
-    final now = DateTime.now();
-    final yesterday = now.subtract(const Duration(days: 1));
-    final startOfYesterday = DateTime(
-      yesterday.year,
-      yesterday.month,
-      yesterday.day,
+    final startOfYesterday = DateTime.now().subtract(const Duration(days: 1));
+    final threshold = DateTime(
+      startOfYesterday.year,
+      startOfYesterday.month,
+      startOfYesterday.day,
     );
-
     return _notifications
-        .where((n) => n.createdAt.isBefore(startOfYesterday))
+        .where((n) => n.createdAt.isBefore(threshold))
         .toList();
   }
 
-  // --- Core Actions ---
+  // --- Actions ---
 
-  // 1. Load Notifications from Local Storage
+  /// Loads the history from SharedPreferences
   Future<void> loadNotifications() async {
     _isLoading = true;
     notifyListeners();
@@ -68,8 +65,10 @@ class NotificationViewModel extends ChangeNotifier {
 
       if (notificationsString != null) {
         _notifications = NotificationItem.decode(notificationsString);
-        // Sort by newest first
+        // Ensure newest are always at the top
         _notifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      } else {
+        _notifications = [];
       }
     } catch (e) {
       debugPrint("Error loading notifications: $e");
@@ -79,43 +78,97 @@ class NotificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 2. Add New Notification (Call this when creating a task)
-  Future<void> addNotification({
+  Future<void> scheduleTaskReminder({
+    required String title,
+    required String body,
+    required String type,
+    required DateTime scheduledTime,
+  }) async {
+    final idInt = DateTime.now().millisecondsSinceEpoch.remainder(100000);
+
+    await _notificationService.scheduleNotification(
+      id: idInt,
+      title: title,
+      body: body,
+      scheduledTime: scheduledTime,
+      type: type,
+    );
+
+    await loadNotifications();
+  }
+
+  /// Use this for manual/instant notifications (like a 'Success' alert)
+  Future<void> addInstantNotification({
     required String title,
     required String body,
     required String type,
   }) async {
+    final idInt = DateTime.now().millisecondsSinceEpoch.remainder(100000);
+
+    // 1. Show the system popup
+    await _notificationService.showNotification(
+      id: idInt,
+      title: title,
+      body: body,
+    );
+
+    // 2. Add to UI History manually (since showNotification doesn't save to list)
     final newItem = NotificationItem(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: idInt.toString(),
       title: title,
       body: body,
       createdAt: DateTime.now(),
       type: type,
     );
 
-    _notifications.insert(0, newItem); // Add to top of list
-    notifyListeners();
+    _notifications.insert(0, newItem);
     await _saveToPrefs();
+    notifyListeners();
   }
 
-  // 3. Mark as Read
+  /// Mark a specific notification as read
   Future<void> markAsRead(String id) async {
     final index = _notifications.indexWhere((n) => n.id == id);
     if (index != -1) {
       _notifications[index].isRead = true;
-      notifyListeners();
       await _saveToPrefs();
+      notifyListeners();
     }
   }
 
-  // 4. Delete Notification
-  Future<void> deleteNotification(String id) async {
-    _notifications.removeWhere((n) => n.id == id);
-    notifyListeners();
+  /// Mark all as read
+  Future<void> markAllAsRead() async {
+    for (var n in _notifications) {
+      n.isRead = true;
+    }
     await _saveToPrefs();
+    notifyListeners();
   }
 
-  // Helper to save current list to disk
+  /// Deletes notification from UI and system (if scheduled)
+  Future<void> deleteNotification(String id) async {
+    // 1. Cancel system notification if it was scheduled
+    final idInt = int.tryParse(id);
+    if (idInt != null) {
+      await _notificationService.cancel(idInt);
+    }
+
+    // 2. Remove from local list
+    _notifications.removeWhere((n) => n.id == id);
+    await _saveToPrefs();
+    notifyListeners();
+  }
+
+  /// Completely wipe notification history
+  Future<void> clearAll() async {
+    _notifications.clear();
+    await _notificationService.cancelAll();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('local_notifications');
+    notifyListeners();
+  }
+
+  // Helper to sync local list to storage
   Future<void> _saveToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final String encodedData = NotificationItem.encode(_notifications);

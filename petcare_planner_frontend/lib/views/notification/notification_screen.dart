@@ -198,9 +198,8 @@ class _NotificationItem extends StatelessWidget {
       direction: DismissDirection.endToStart,
       onDismissed: (direction) {
         // Delete from storage
-        context.read<NotificationViewModel>().deleteNotification(
-          notification.id,
-        );
+        final vm = context.read<NotificationViewModel>();
+        vm.deleteNotification(notification.id);
       },
       background: Container(
         margin: const EdgeInsets.only(bottom: 16),

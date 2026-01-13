@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:petcare_planner_frontend/models/notification_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
@@ -142,6 +143,7 @@ class NotificationService {
     required String title,
     required String body,
     required DateTime scheduledTime,
+    required String type,
     String? payload,
   }) async {
     final settings = await _getSettings();
@@ -179,6 +181,28 @@ class NotificationService {
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         payload: payload,
+      );
+
+      final prefs = await SharedPreferences.getInstance();
+      final String? existingData = prefs.getString('local_notifications');
+      List<NotificationItem> list = existingData != null
+          ? NotificationItem.decode(existingData)
+          : [];
+
+      list.insert(
+        0,
+        NotificationItem(
+          id: id.toString(),
+          title: title,
+          body: body,
+          createdAt: DateTime.now(),
+          type: type,
+        ),
+      );
+
+      await prefs.setString(
+        'local_notifications',
+        NotificationItem.encode(list),
       );
 
       debugPrint("Notification scheduled for $scheduledTime");
