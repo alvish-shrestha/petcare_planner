@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_underscores
+
 import 'package:flutter/material.dart';
 import 'package:petcare_planner_frontend/models/pet.dart';
 import 'package:petcare_planner_frontend/widgets/app_colors.dart';
@@ -28,7 +30,7 @@ class PetCard extends StatelessWidget {
           : ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: pets.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
                 final pet = pets[index];
                 final selected = selectedPetId == pet.id;

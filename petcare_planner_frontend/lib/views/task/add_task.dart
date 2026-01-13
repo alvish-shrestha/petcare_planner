@@ -1,6 +1,7 @@
 // ignore_for_file: unused_element_parameter, unnecessary_underscores, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:petcare_planner_frontend/services/notification_service.dart';
 import 'package:petcare_planner_frontend/widgets/app_colors.dart';
 import 'package:petcare_planner_frontend/view_models/pet_view_model.dart';
 import 'package:petcare_planner_frontend/view_models/task_view_model.dart';
@@ -63,6 +64,33 @@ class _AddTaskFormState extends State<_AddTaskForm> {
     taskTitleController.dispose();
     notesController.dispose();
     super.dispose();
+  }
+
+  // --- Helper to Schedule Notification ---
+  Future<void> _handleNotificationScheduling(String petName) async {
+    if (!reminder || selectedDate == null || selectedTime == null) return;
+
+    final DateTime scheduledDateTime = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      selectedTime!.hour,
+      selectedTime!.minute,
+    );
+    final DateTime notificationTime = scheduledDateTime.subtract(
+      const Duration(minutes: 15),
+    );
+
+    if (notificationTime.isAfter(DateTime.now())) {
+      int notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+      await NotificationService().scheduleNotification(
+        id: notificationId,
+        title: 'Upcoming: $selectedTaskType for $petName',
+        body: '${taskTitleController.text} starts in 15 minutes!',
+        scheduledTime: notificationTime,
+      );
+    }
   }
 
   @override
@@ -415,6 +443,7 @@ class _AddTaskFormState extends State<_AddTaskForm> {
               width: 330,
               child: ReminderToggle(
                 initialValue: true,
+                subtitle: "Get notified 15 min before",
                 onChanged: (val) => setState(() => reminder = val),
               ),
             ),
@@ -492,6 +521,21 @@ class _AddTaskFormState extends State<_AddTaskForm> {
                             type: SnackBarType.error,
                           );
                         } else if (success) {
+                          try {
+                            final petName = petViewModel.pets
+                                .firstWhere((p) => p.id == selectedPetId)
+                                .petName;
+
+                            // Trigger the schedule
+                            await _handleNotificationScheduling(petName);
+                            debugPrint(
+                              "Notification logic executed for $petName",
+                            );
+                          } catch (e) {
+                            debugPrint("Error scheduling notification: $e");
+                          }
+                          // --- END: NOTIFICATION LOGIC ---
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
